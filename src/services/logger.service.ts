@@ -18,6 +18,7 @@ await log.setup({
       default: { level: "DEBUG", handlers: ["console", "file"], },
       acodegaService: { level: "DEBUG", handlers: ["console", "file"], },
       publishService: { level: "DEBUG", handlers: ["console", "file"], },
+      discordService: { level: "DEBUG", handlers: ["console", "file"], },
    },
 });
 
