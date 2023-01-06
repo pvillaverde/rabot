@@ -8,7 +8,7 @@ import { Config, Credentials } from '../config.ts';
 const logger = log.getLogger('publishService');
 
 export function publish(channel: PodcastChannel | YoutubeChannel | TwitchChannel) {
-   logger.debug("publish", channel)
+   logger.info(`Publishing update for channel ${channel.title}: ${channel.lastFeedEntry.title}`)
    publishMastodon(channel);
    publishTwitter(channel);
    publishDiscord(channel);
@@ -44,12 +44,12 @@ async function publishTwitter(channel: PodcastChannel | YoutubeChannel | TwitchC
          .replace(/{url}/g, channel.lastFeedEntry && channel.lastFeedEntry.link ? channel.lastFeedEntry.link : ``)
 
       const twitter = new TwitterApi(Credentials[channel.type].twitter);
-      await twitter.v2.tweet(messageStatus);
+      const status = await twitter.v2.tweet(messageStatus);
+      logger.debug(status);
       logger.debug(`Published twitter status for channel ${channel.title}`);
    } catch (error) {
       logger.error(`Error publishing twitter status`, error);
    }
-   logger.debug("publish", channel)
 }
 
 function publishDiscord(channel: PodcastChannel | YoutubeChannel | TwitchChannel) {

@@ -41,7 +41,7 @@ interface Credentials {
    };
 }
 export const Credentials: Credentials = {
-   google: JSON.parse((Deno.env.get("RABOT_GOOGLE_CREDENTIALS") as string).trim()),
+   google: JSON.parse(Deno.env.get("RABOT_GOOGLE_CREDENTIALS") as string),
    discord: JSON.parse(Deno.env.get("RABOT_DISCORD_CREDENTIALS") as string),
    twitch: JSON.parse(Deno.env.get("RABOT_TWITCH_CREDENTIALS") as string),
    galegotube: JSON.parse(Deno.env.get("RABOT_GALEGOTUBE_CREDENTIALS") as string),

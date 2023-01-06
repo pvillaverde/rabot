@@ -1,6 +1,7 @@
 import log from "./logger.service.ts";
 import { parseFeed } from "https://deno.land/x/rss@0.5.6/mod.ts";
 import { publish } from "./publish.service.ts";
+import moment from "https://deno.land/x/momentjs@2.29.1-deno/mod.ts";
 
 const logger = log.getLogger('acodegaService');
 interface BaseChannel {
@@ -42,7 +43,7 @@ async function getLastFeedEntry(rssURL: string) {
       const feed = await parseFeed(xml);
       if (feed.entries && feed.entries[0]) {
          return {
-            title: feed.entries[0].title as string,
+            title: feed.entries[0].title?.value as string,
             published: feed.entries[0].published,
             link: feed.entries[0].links[0].href,
          };
@@ -63,6 +64,7 @@ async function fetchJsonData(url: string) {
 
 /** Refresca os datos de todas as plataformas. */
 export async function refreshData() {
+   logger.debug(`Refreshing all data from Podcasts, Youtube and Twitch`);
    return await Promise.all([
       refreshPodcasts(),
       refreshYoutube(),
@@ -73,17 +75,21 @@ export async function refreshData() {
 /** Refresca os datos de youtube e comproba o último vídeo da canle. */
 async function refreshYoutube() {
    try {
+      const now = moment();
+      //TODO: Se cada vez que refrescamos sustitúe o array, nunca vai detectar vídeos novos!! O mesmo para o RSS
       youtubeChannels = await fetchJsonData('https://obradoirodixitalgalego.gal/api/youtube.json');
       // Recorre cada canle e obtén o seu último vídeo
       logger.debug(`START: Refreshing ${youtubeChannels.length} youtube channels`);
       for (const channel of youtubeChannels) {
          const lastFeedEntry = await getLastFeedEntry(`https://www.youtube.com/feeds/videos.xml?channel_id=${channel.youtube}`);
-         if (!lastFeedEntry) continue;
-         // Se ten último vídeo e é distinto do último que recuperou RABOT, publica nas canles que toque.
-         if (channel.lastFeedEntry && channel.lastFeedEntry.published != lastFeedEntry.published) {
-            publish(channel);
+         if (lastFeedEntry) {
+            channel.type = "galegotube";
+            channel.lastFeedEntry = lastFeedEntry;
+            // Se ten último vídeo e é distinto do último que recuperou RABOT, publica nas canles que toque.
+            if (lastFeedEntry && (now.diff(moment(lastFeedEntry.published), 'minutes') <= 15)) {
+               publish(channel);
+            }
          }
-         channel.lastFeedEntry = lastFeedEntry;
       }
       logger.debug(`END: Refreshed ${youtubeChannels.length} youtube channels with their last video`);
    } catch (error) { logger.error(error); }
@@ -92,17 +98,20 @@ async function refreshYoutube() {
 
 async function refreshPodcasts() {
    try {
+      const now = moment();
       podcastChannels = await fetchJsonData('https://obradoirodixitalgalego.gal/api/podcast.json');
       // Recorre cada canle e obtén o seu último podcast
       logger.debug(`START: Refreshing ${podcastChannels.length} podcast channels`);
       for (const channel of podcastChannels) {
          const lastFeedEntry = await getLastFeedEntry(channel.rss);
-         if (!lastFeedEntry) continue;
-         // Se ten último podcast e é distinto do último que recuperou RABOT, publica nas canles que toque.
-         if (channel.lastFeedEntry && channel.lastFeedEntry.published != lastFeedEntry.published) {
-            publish(channel);
+         if (lastFeedEntry) {
+            channel.type = "podgalego";
+            channel.lastFeedEntry = lastFeedEntry;
+            // Se ten último podcast e é distinto do último que recuperou RABOT, publica nas canles que toque.
+            if (lastFeedEntry && (now.diff(moment(lastFeedEntry.published), 'minutes') <= 15)) {
+               publish(channel);
+            }
          }
-         channel.lastFeedEntry = lastFeedEntry;
       }
       logger.debug(`END: Refreshed ${podcastChannels.length} podcasts channels with their last podcast`);
    } catch (error) { logger.error(error); }
