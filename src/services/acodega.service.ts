@@ -14,15 +14,19 @@ interface ShortFeedEntry {
    link?: string;
 }
 export interface PodcastChannel extends BaseChannel {
+   type: 'podgalego';
    rss: string;
    lastFeedEntry: ShortFeedEntry
 }
 export interface YoutubeChannel extends BaseChannel {
+   type: 'galegotube';
    youtube: string;
    lastFeedEntry: ShortFeedEntry
 }
 export interface TwitchChannel extends BaseChannel {
+   type: 'galegotwitch';
    twitch: string;
+   lastFeedEntry: ShortFeedEntry
 }
 
 export let podcastChannels: PodcastChannel[];
@@ -47,7 +51,7 @@ async function getLastFeedEntry(rssURL: string) {
          return false;
       }
    } catch (error) {
-      logger.debug(`No feed entries for RSS ${rssURL}`, error)
+      logger.warning(`No feed entries for RSS ${rssURL}`, error)
       return false;
    }
 }

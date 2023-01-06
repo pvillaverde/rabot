@@ -1,5 +1,9 @@
 import { PodcastChannel, YoutubeChannel, TwitchChannel } from './acodega.service.ts';
 import log from "./logger.service.ts";
+import { login } from 'npm:masto';
+import { TwitterApi } from 'npm:twitter-api-v2';
+import { Config, Credentials } from '../config.ts';
+
 
 const logger = log.getLogger('publishService');
 
@@ -10,49 +14,42 @@ export function publish(channel: PodcastChannel | YoutubeChannel | TwitchChannel
    publishDiscord(channel);
 
 }
-function publishMastodon(channel: PodcastChannel | YoutubeChannel | TwitchChannel) {
-   logger.debug("publish", channel)
-   /* if (!config.mastodon) return;
-   const client = new Mastodon({
-      access_token: config.mastodon.access_token,
-      timeout_ms: config.mastodon.timeout_ms,
-      api_url: config.mastodon.api_url,
-   });
-   let message = config.mastodon.messageTemplate
-      .replace(/{channelName}/g, channel.name)
-      .replace(/{title}/g, Discord.Util.escapeMarkdown(videoTitle))
-      .replace(/{url}/g, videoLink);
+async function publishMastodon(channel: PodcastChannel | YoutubeChannel | TwitchChannel) {
+   // Se Mastodon non está habilitado para a plataforma non facemos nada.
+   if (!Config[channel.type].mastodon) return;
    try {
-      var success = await client.post('statuses', { status: message });
-      console.log('[YoutubeMonitor-Mastodon]', `Enviouse actualización a Mastodon da canle: ${channel.name}`);
+      const messageStatus = Config[channel.type].messageTemplate
+         .replace(/{channelName}/g, channel.title)
+         .replace(/{mentionUser}/g, channel.mastodon ? ` (${channel.mastodon})` : ``)
+         .replace(/{title}/g, channel.lastFeedEntry && channel.lastFeedEntry.title ? channel.lastFeedEntry.title : ``)
+         .replace(/{url}/g, channel.lastFeedEntry && channel.lastFeedEntry.link ? channel.lastFeedEntry.link : ``)
+
+      const mastodon = await login(Credentials[channel.type].mastodon);
+      const status = await mastodon.v1.statuses.create({ status: messageStatus, visibility: 'public', });
+
+      logger.debug(`Published mastodon status in ${status.url}`);
    } catch (error) {
-      new FileDatabaseService('live-messages').put('last-error', moment());
-      console.error('[YoutubeMonitor-Mastodon]', `Non se puido enviar o toot da canle ${channel.name}`, error);
-   } */
+      logger.error(`Error publishing mastodon status`, error);
+   }
 }
 
-function publishTwitter(channel: PodcastChannel | YoutubeChannel | TwitchChannel) {
-   logger.debug("publish", channel)
-
-   /* if (!config.twitter) return;
-   const client = new TwitterApi({
-      appKey: config.twitter.appKey,
-      appSecret: config.twitter.appSecret,
-      accessToken: config.twitter.accessToken,
-      accessSecret: config.twitter.accessSecret,
-   });
-   let message = config.twitter.messageTemplate
-      .replace(/{channelName}/g, channel.name)
-      .replace(/{twitterUser}/g, channel.twitter && channel.twitter.startsWith('@') ? `(${channel.twitter})` : '')
-      .replace(/{title}/g, Discord.Util.escapeMarkdown(videoTitle))
-      .replace(/{url}/g, videoLink);
+async function publishTwitter(channel: PodcastChannel | YoutubeChannel | TwitchChannel) {
+   // Se Twitter non está habilitado para a plataforma non facemos nada.
+   if (!Config[channel.type].twitter) return;
    try {
-      var success = await client.v2.tweet(message);
-      console.log('[YoutubeMonitor-Twitter]', `Enviouse actualización a twitter da canle: ${channel.name}`);
+      const messageStatus = Config[channel.type].messageTemplate
+         .replace(/{channelName}/g, channel.title)
+         .replace(/{mentionUser}/g, channel.twitter ? ` (${channel.twitter})` : ``)
+         .replace(/{title}/g, channel.lastFeedEntry && channel.lastFeedEntry.title ? channel.lastFeedEntry.title : ``)
+         .replace(/{url}/g, channel.lastFeedEntry && channel.lastFeedEntry.link ? channel.lastFeedEntry.link : ``)
+
+      const twitter = new TwitterApi(Credentials[channel.type].twitter);
+      await twitter.v2.tweet(messageStatus);
+      logger.debug(`Published twitter status for channel ${channel.title}`);
    } catch (error) {
-      new FileDatabaseService('live-messages').put('last-error', moment());
-      console.error('[YoutubeMonitor-Twitter]', `Non se puido enviar o tweet da canle ${channel.name}`, error);
-   } */
+      logger.error(`Error publishing twitter status`, error);
+   }
+   logger.debug("publish", channel)
 }
 
 function publishDiscord(channel: PodcastChannel | YoutubeChannel | TwitchChannel) {

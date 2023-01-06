@@ -1,7 +1,6 @@
 interface MastodonCredentials {
-   access_token: string,
-   timeout_ms: number,
-   api_url: string,
+   accessToken: string,
+   url: string,
 }
 
 interface TwitterCredentials {
@@ -22,10 +21,11 @@ interface Credentials {
       redirect_uris: string[];
    };
    discord: {
-      bot_token: string;
+      token: string;
    };
    twitch: {
-      bot_token: string;
+      client_id: string;
+      client_secret: string;
    };
    galegotube: {
       twitter: TwitterCredentials;
@@ -48,7 +48,23 @@ export const Credentials: Credentials = {
    galegotwitch: JSON.parse(Deno.env.get("RABOT_GALEGOTWITCH_CREDENTIALS") as string),
    podgalego: JSON.parse(Deno.env.get("RABOT_PODGALEGO_CREDENTIALS") as string),
 }
-console.log(Credentials);
 export const Config = {
-   
+   galegotube: {
+      mastodon: true,
+      twitter: true,
+      discord: true,
+      messageTemplate: '🤖🎬 {channelName}{mentionUser} acaba de publicar o vídeo "{title}" no #GalegoTube #Youtubeiras. Dálle unha ollada en\n{url}'
+   },
+   galegotwitch: {
+      mastodon: true,
+      twitter: true,
+      discord: true,
+      messageTemplate: '🤖📺 {channelName}{mentionUser} está agora en directo emitindo  "{title}" en #GalegoTwitch #TwitchEnGalego. Dálle unha ollada en\n{url}'
+   },
+   podgalego: {
+      mastodon: false,
+      twitter: false,
+      discord: false,
+      messageTemplate: '🤖🎙️ {channelName}{mentionUser} acaba de publicar un nodo falangullo : "{title}" #PodGalego. Podes escoitalo en\n{url}'
+   },
 };
