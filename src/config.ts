@@ -50,21 +50,24 @@ export const Credentials: Credentials = {
 }
 export const Config = {
    galegotube: {
-      mastodon: true,
-      twitter: true,
+      mastodon: false,
+      twitter: false,
       discord: true,
+      discordChannelName: "🟥youtube-galego",
       messageTemplate: '🤖🎬 {channelName}{mentionUser} acaba de publicar o vídeo "{title}" no #GalegoTube #Youtubeiras. Dálle unha ollada en\n{url}'
    },
    galegotwitch: {
-      mastodon: true,
-      twitter: true,
+      mastodon: false,
+      twitter: false,
       discord: true,
+      discordChannelName: "📡emitindo-twitch-galego",
       messageTemplate: '🤖📺 {channelName}{mentionUser} está agora en directo emitindo  "{title}" en #GalegoTwitch #TwitchEnGalego. Dálle unha ollada en\n{url}'
    },
    podgalego: {
       mastodon: false,
       twitter: false,
       discord: false,
+      discordChannelName: "🎙️podgalego",
       messageTemplate: '🤖🎙️ {channelName}{mentionUser} acaba de publicar un nodo falangullo : "{title}" #PodGalego. Podes escoitalo en\n{url}'
    },
 };

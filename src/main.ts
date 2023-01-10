@@ -13,7 +13,7 @@ async function bootStrapApp() {
     ----------------------------------
    `);
    // Refrescado inicial dos datos da web de Obradoiro Dixital Galego
-   await refreshData();
+   /* await refreshData(); */
    await startDiscordBot();
 
    everyMinute(() => {
