@@ -49,6 +49,9 @@ export const Credentials: Credentials = {
    podgalego: JSON.parse(Deno.env.get("RABOT_PODGALEGO_CREDENTIALS") as string),
 }
 export const Config = {
+   logger: {
+      ConsoleLogLevel: Deno.env.get("RABOT_CONSOLE_LOG_LEVELE") as "NOTSET" | "DEBUG" | "INFO" | "WARNING" | "ERROR" | "CRITICAL",
+   },
    galegotube: {
       mastodon: false,
       twitter: false,
@@ -66,7 +69,7 @@ export const Config = {
    podgalego: {
       mastodon: false,
       twitter: false,
-      discord: false,
+      discord: true,
       discordChannelName: "🔊podgalego",
       messageTemplate: '🤖🔊 {channelName}{mentionUser} acaba de publicar un nodo falangullo : "{title}" #PodGalego. Podes escoitalo en\n{url}'
    },

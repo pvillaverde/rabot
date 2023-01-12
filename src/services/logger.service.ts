@@ -1,9 +1,10 @@
 import * as log from "https://deno.land/std@0.171.0/log/mod.ts";
+import { Config } from "../config.ts";
 // https://medium.com/deno-the-complete-reference/using-logger-in-deno-44c5b2372bf3
 await log.setup({
    //define handlers
    handlers: {
-      console: new log.handlers.ConsoleHandler("DEBUG", {
+      console: new log.handlers.ConsoleHandler(Config.logger.ConsoleLogLevel, {
          formatter: "{datetime} [{loggerName}-{levelName}] {msg}"
       }),
       file: new log.handlers.RotatingFileHandler('ERROR', {
