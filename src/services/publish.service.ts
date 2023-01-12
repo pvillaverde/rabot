@@ -3,6 +3,7 @@ import log from "./logger.service.ts";
 import { login } from 'npm:masto';
 import { TwitterApi } from 'npm:twitter-api-v2';
 import { Config, Credentials } from '../config.ts';
+import { sendMessageToDiscordChannels } from '../bot/utils/helpers.ts';
 
 
 const logger = log.getLogger('publishService');
@@ -52,7 +53,19 @@ async function publishTwitter(channel: PodcastChannel | YoutubeChannel | TwitchC
    }
 }
 
-function publishDiscord(channel: PodcastChannel | YoutubeChannel | TwitchChannel) {
-   logger.debug("publish", channel)
+async function publishDiscord(channel: PodcastChannel | YoutubeChannel | TwitchChannel) {
+   // Se Discord non está habilitado para a plataforma non facemos nada.
+   if (!Config[channel.type].discord) return;
+   try {
+      const messageStatus = Config[channel.type].messageTemplate
+         .replace(/{channelName}/g, channel.title)
+         .replace(/{mentionUser}/g, '')
+         .replace(/{title}/g, channel.lastFeedEntry && channel.lastFeedEntry.title ? channel.lastFeedEntry.title : ``)
+         .replace(/{url}/g, channel.lastFeedEntry && channel.lastFeedEntry.link ? channel.lastFeedEntry.link : ``)
 
+      await sendMessageToDiscordChannels(channel.type, messageStatus)
+      logger.debug(`Published discord status for channel ${channel.title}`);
+   } catch (error) {
+      logger.error(`Error publishing discord status`, error);
+   }
 }

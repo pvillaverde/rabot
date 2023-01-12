@@ -6,8 +6,8 @@
 - [ ] Tanto para Youtube como para Podcast, non vale con que comprobe que sexa do último día. Ten que verificar tamén que sexa o derradeiro. Pode haber publicación retrasadas porque saen en privado/oculto.
 - [X] Servizo de publicación a Twitter e Mastodon, coa configuración segundo a comunidade (Twitch, Youtube, Podcast) e a posibilidade de desactivar cada servizo.
 - [X] Configuración inicial do Bot de Discord: https://deno.land/x/discordeno@17.0.1
-- [ ] Configuración das canles de Discord correspondentes (galegotwitch, galegotube, podgalego) e envío de mensaxe na que corresponda.
-- [ ] Proba do envío de notificacións a twitter, mastodon e discord das actualizacións de GalegoTube. **Neste punto, poderíamos publicar o servizo e prescindir de Galtubot**
+- [X] Configuración das canles de Discord correspondentes (galegotwitch, galegotube, podgalego) e envío de mensaxe na que corresponda.
+- [X] Proba do envío de notificacións a twitter, mastodon e discord das actualizacións de GalegoTube. **Neste punto, poderíamos publicar o servizo e prescindir de Galtubot**
 - [ ] Consulta cada hora do calendario de Google e actualización da mensaxe na canle #axenda do Discord. **Unha vez feito isto, podemos prescindir de Calengram**
 - [ ] Consulta dos datos de Twitch cada minuto para ver que canles están en directo. Envío das notificacións a Twitter e Mastodon cando unha canle entra en directo.
 - [ ] Envío e actualización das mensaxes de Discord cando hai canles en directo, incluíndo a miniatura da transmisión como fai actualmente **timbot**.

@@ -1,7 +1,7 @@
 import { events } from "./mod.ts";
 import { Config } from "../../config.ts";
 import { DiscordBot, logger, targetChannels } from "../mod.ts";
-import { Guild, Channel, Bot, sendMessage, getDmChannel, hasChannelPermissions, requireBotChannelPermissions } from "../deps.ts";
+import { Guild, Channel, Bot, sendMessage, getDmChannel, hasChannelPermissions } from "../deps.ts";
 
 events.guildCreate = async (bot: Bot, guild: Guild) => {
    logger.info(`Joined new server: ${guild.name}`)
@@ -14,12 +14,8 @@ events.guildCreate = async (bot: Bot, guild: Guild) => {
          sendMessageToDiscordOwner(bot, guild, `Ocurriu un erro ao configurar o bot, non atopo a canle \`${channelName}\` no servidor \`${guild.name}\`, engádea para recibir as notificacións de ${platform}.`);
       } else {
          const member = await DiscordBot.helpers.getMember(guild.id, DiscordBot.id);
-         console.log(hasChannelPermissions(DiscordBot, targetChannel, member, ['SEND_MESSAGES', 'VIEW_CHANNEL']))
          if (hasChannelPermissions(DiscordBot, targetChannel, member, ['SEND_MESSAGES', 'VIEW_CHANNEL'])) {
-
-            sendMessage(bot, targetChannel.id, { content: "test" }).catch(console.log);
             logger.info(`Member of server ${guild.name}, target channel is #${targetChannel.name}`)
-
             targetChannels[platform].push(targetChannel);
          } else {
             logger.warning(`Permission problem! I do not have SEND_MESSAGES permission on channel #${targetChannel.name} on ${guild.name}: announcement sends will fail.`)
