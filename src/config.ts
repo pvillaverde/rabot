@@ -67,7 +67,7 @@ export const Config = {
       mastodon: false,
       twitter: false,
       discord: false,
-      discordChannelName: "🎙️podgalego",
-      messageTemplate: '🤖🎙️ {channelName}{mentionUser} acaba de publicar un nodo falangullo : "{title}" #PodGalego. Podes escoitalo en\n{url}'
+      discordChannelName: "🔊podgalego",
+      messageTemplate: '🤖🔊 {channelName}{mentionUser} acaba de publicar un nodo falangullo : "{title}" #PodGalego. Podes escoitalo en\n{url}'
    },
 };

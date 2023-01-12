@@ -1,6 +1,6 @@
 import { cron, everyMinute, every15Minute, hourly } from "https://deno.land/x/deno_cron@v1.0.0/cron.ts";
 import { refreshData } from "./services/acodega.service.ts";
-import startDiscordBot from "./services/discord.service.ts";
+import startDiscordBot from "./bot/mod.ts";
 import log from "./services/logger.service.ts";
 
 async function bootStrapApp() {
