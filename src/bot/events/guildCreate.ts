@@ -1,9 +1,9 @@
 import { events } from "./mod.ts";
 import { Config } from "../../config.ts";
 import { DiscordBot, logger, targetChannels } from "../mod.ts";
-import { Guild, Channel, Bot, sendMessage, getDmChannel, hasChannelPermissions } from "../deps.ts";
+import { Guild, Channel, Bot, sendMessage, getDmChannel, hasChannelPermissions, Member } from "../deps.ts";
 
-events.guildCreate = async (bot: Bot, guild: Guild) => {
+events.guildCreate = (bot: Bot, guild: Guild) => {
    logger.info(`Joined new server: ${guild.name}`)
 
    for (const platform of (Object.keys(targetChannels) as ("galegotube" | "galegotwitch" | "podgalego")[])) {
@@ -13,8 +13,8 @@ events.guildCreate = async (bot: Bot, guild: Guild) => {
          logger.warning(`Configuration problem! Guild ${guild.name} does not have a #${channelName} channel!`)
          sendMessageToDiscordOwner(bot, guild, `Ocurriu un erro ao configurar o bot, non atopo a canle \`${channelName}\` no servidor \`${guild.name}\`, engádea para recibir as notificacións de ${platform}.`);
       } else {
-         const member = await DiscordBot.helpers.getMember(guild.id, DiscordBot.id);
-         if (hasChannelPermissions(DiscordBot, targetChannel, member, ['SEND_MESSAGES', 'VIEW_CHANNEL'])) {
+         const member = DiscordBot.members.get(DiscordBot.transformers.snowflake(`${bot.id}${guild.id}`))
+         if (hasChannelPermissions(DiscordBot, targetChannel, member as Member, ['SEND_MESSAGES', 'VIEW_CHANNEL'])) {
             logger.info(`Member of server ${guild.name}, target channel is #${targetChannel.name}`)
             targetChannels[platform].push(targetChannel);
          } else {

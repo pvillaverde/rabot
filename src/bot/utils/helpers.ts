@@ -1,4 +1,4 @@
-import { Channel, sendMessage } from "../deps.ts";
+import { sendMessage } from "../deps.ts";
 import { DiscordBot, targetChannels } from "../mod.ts";
 
 export async function sendMessageToDiscordChannels(platform: "galegotube" | "galegotwitch" | "podgalego", content: string) {
