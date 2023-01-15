@@ -1,4 +1,7 @@
 # RABOT: Rede Automatizada de Barullo, Ondas e Transmisións
+Esta aplicación encárgase de obter a información das canles rexistradas na [Asociación Cultural Obradoiro Dixital Galego](https://obradoirodixitalgalego.gal) e dinfundir o novo contido que xeran estes proxectos en galego pola rede, a través das canlees da asociación (Twitter, Mastodon e Discord).
+
+## Funcións (feitas e por desenvolver)
 
 - [X] Feito en DENO en lugar de NODEjs
 - [X] Tarefas de CRON que se executen cada minuto, cada 15 minutos, cada hora, cada día...
@@ -16,5 +19,5 @@
 ## Funcionalidades extra
 - [ ] Os RSS de Podcast non permiten obter máis datos, pero cos de Youtube poderíamos gardar certas estatísticas, ao igual que se fai coas de Twitch. Poderíase facer o que fan os bots de estatísticas dende este.
 - [ ] Creación dunha imaxe co calendario do día ou da semana para publicar nas redes
-- [ ]
+- [X] Gardado das estatísticas de Youtube diariamente.
 - [ ]
