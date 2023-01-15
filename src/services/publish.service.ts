@@ -1,21 +1,23 @@
-import { PodcastChannel, YoutubeChannel, TwitchChannel } from './acodega.service.ts';
 import log from "./logger.service.ts";
 import { login } from 'npm:masto';
 import { TwitterApi } from 'npm:twitter-api-v2';
 import { Config, Credentials } from '../config.ts';
 import { sendMessageToDiscordChannels } from '../bot/utils/helpers.ts';
+import { PodcastChannelData } from '../acodega/podcast.ts';
+import { YoutubeChannelData } from '../acodega/youtube.ts';
+import { TwitchChannelData } from '../acodega/twitch.ts';
 
 
 const logger = log.getLogger('publishService');
 
-export function publish(channel: PodcastChannel | YoutubeChannel | TwitchChannel) {
+export function publish(channel: PodcastChannelData | YoutubeChannelData | TwitchChannelData) {
    logger.info(`Publishing update for channel ${channel.title}: ${channel.lastFeedEntry.title}`)
    publishMastodon(channel);
    publishTwitter(channel);
    publishDiscord(channel);
 
 }
-async function publishMastodon(channel: PodcastChannel | YoutubeChannel | TwitchChannel) {
+async function publishMastodon(channel: PodcastChannelData | YoutubeChannelData | TwitchChannelData) {
    // Se Mastodon non está habilitado para a plataforma non facemos nada.
    if (!Config[channel.type].mastodon) return;
    try {
@@ -34,7 +36,7 @@ async function publishMastodon(channel: PodcastChannel | YoutubeChannel | Twitch
    }
 }
 
-async function publishTwitter(channel: PodcastChannel | YoutubeChannel | TwitchChannel) {
+async function publishTwitter(channel: PodcastChannelData | YoutubeChannelData | TwitchChannelData) {
    // Se Twitter non está habilitado para a plataforma non facemos nada.
    if (!Config[channel.type].twitter) return;
    try {
@@ -53,7 +55,7 @@ async function publishTwitter(channel: PodcastChannel | YoutubeChannel | TwitchC
    }
 }
 
-async function publishDiscord(channel: PodcastChannel | YoutubeChannel | TwitchChannel) {
+async function publishDiscord(channel: PodcastChannelData | YoutubeChannelData | TwitchChannelData) {
    // Se Discord non está habilitado para a plataforma non facemos nada.
    if (!Config[channel.type].discord) return;
    try {

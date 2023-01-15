@@ -1,5 +1,5 @@
-import { cron, everyMinute, every15Minute, hourly } from "https://deno.land/x/deno_cron@v1.0.0/cron.ts";
-import { refreshData } from "./services/acodega.service.ts";
+import { cron, everyMinute, every15Minute, hourly, daily } from "https://deno.land/x/deno_cron@v1.0.0/cron.ts";
+import { refreshData } from "./acodega/mod.ts";
 import startDiscordBot from "./bot/mod.ts";
 import log from "./services/logger.service.ts";
 
@@ -40,8 +40,14 @@ async function bootStrapApp() {
 
    });
 
+   daily(() => {
+      logger.debug("Daily cron at 1:00")
+
+      //TODO: Obter as estatísticas de GalegoTube unha vez o día.
+   })
+
    cron("5 0 0 * * *", () => {
-      logger.debug("daily cron")
+      logger.debug("Daily cron at 5:00")
       // Crear unha imaxe diaria cos datos que haxa no calendario.
 
    });
