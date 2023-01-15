@@ -46,6 +46,13 @@ export const Config = {
    logger: {
       ConsoleLogLevel: Deno.env.get("RABOT_CONSOLE_LOG_LEVELE") as "NOTSET" | "DEBUG" | "INFO" | "WARNING" | "ERROR" | "CRITICAL",
    },
+   axenda: {
+      calendarId: "galegotwitch@gmail.com",
+      discordChannelId: "796338134542974986",
+      discordChannelMessageId: "1064315573732905051",
+      locale: 'gl',
+      days: 4,
+   },
    galegotube: {
       mastodon: false,
       twitter: false,

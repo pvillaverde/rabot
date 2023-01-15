@@ -20,6 +20,7 @@ await log.setup({
       acodegaService: { level: "DEBUG", handlers: ["console", "file"], },
       publishService: { level: "DEBUG", handlers: ["console", "file"], },
       discordService: { level: "DEBUG", handlers: ["console", "file"], },
+      agendaService: { level: "DEBUG", handlers: ["console", "file"], },
    },
 });
 

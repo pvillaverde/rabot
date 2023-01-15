@@ -2,6 +2,7 @@ import { cron, everyMinute, every15Minute, hourly, daily } from "https://deno.la
 import { refreshData } from "./acodega/mod.ts";
 import { refreshYoutubeStats } from "./acodega/youtube.ts";
 import startDiscordBot from "./bot/mod.ts";
+import { refreshAgenda } from "./services/agenda.service.ts";
 import log from "./services/logger.service.ts";
 
 async function bootStrapApp() {
@@ -16,7 +17,6 @@ async function bootStrapApp() {
    // Refrescado inicial dos datos da web de Obradoiro Dixital Galego
    await startDiscordBot();
    await refreshData();
-
    everyMinute(() => {
       logger.debug("everyMinute cron")
       // Comprobar se hai canles emitindo en twitch
@@ -35,9 +35,10 @@ async function bootStrapApp() {
       // Comprobar se hai novos capítulos nos podcasts.
    });
 
-   hourly(() => {
+   hourly(async () => {
       logger.debug("hourly cron")
       // Actualizar axenda do Discord
+      await refreshAgenda();
 
    });
 
