@@ -1,4 +1,5 @@
-import { fetchJsonData, getFeedData, logger, BaseChannelData } from "./mod.ts";
+import { logger, BaseChannelData } from "./mod.ts";
+import { fetchJsonData, getFeedData } from "../services/utils.service.ts";
 import { publish } from "../services/publish.service.ts";
 import { DataTypes, Model, Relationships } from "https://deno.land/x/denodb@v1.2.0/mod.ts";
 import { Credentials } from "../config.ts";
