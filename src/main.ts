@@ -1,5 +1,6 @@
 import { cron, everyMinute, every15Minute, hourly, daily } from "https://deno.land/x/deno_cron@v1.0.0/cron.ts";
 import { refreshData } from "./acodega/mod.ts";
+import { refreshYoutubeStats } from "./acodega/youtube.ts";
 import startDiscordBot from "./bot/mod.ts";
 import log from "./services/logger.service.ts";
 
@@ -40,10 +41,11 @@ async function bootStrapApp() {
 
    });
 
-   daily(() => {
+   daily(async () => {
       logger.debug("Daily cron at 1:00")
 
       //TODO: Obter as estatísticas de GalegoTube unha vez o día.
+      await refreshYoutubeStats();
    })
 
    cron("5 0 0 * * *", () => {

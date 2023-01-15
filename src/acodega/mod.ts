@@ -1,7 +1,7 @@
 import log from "../services/logger.service.ts";
 import rssParser from "npm:rss-parser";
 import { Database, SQLite3Connector } from "https://deno.land/x/denodb@v1.2.0/mod.ts";
-import { refreshYoutube, YoutubeChannel } from "./youtube.ts";
+import { refreshYoutube, YoutubeChannel, YoutubeChannelStats } from "./youtube.ts";
 import { refreshPodcast, PodcastChannel } from "./podcast.ts";
 const feedParser = new rssParser({
    customFields: {
@@ -27,7 +27,7 @@ const connector = new SQLite3Connector({
 const db = new Database(connector);
 
 
-db.link([YoutubeChannel, PodcastChannel]);
+db.link([YoutubeChannel, YoutubeChannelStats, PodcastChannel]);
 
 // Coa opción de drop, está borrando as táboas antes de cargar os datos. Ollo con usar isto en produción.
 await db.sync({ drop: false });

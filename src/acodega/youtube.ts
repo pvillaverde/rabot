@@ -1,6 +1,7 @@
 import { fetchJsonData, getFeedData, logger, BaseChannelData } from "./mod.ts";
 import { publish } from "../services/publish.service.ts";
 import { DataTypes, Model, Relationships } from "https://deno.land/x/denodb@v1.2.0/mod.ts";
+import { Credentials } from "../config.ts";
 
 export class YoutubeChannel extends Model {
    static table = 'youtube_channel';
@@ -29,11 +30,10 @@ export class YoutubeChannelStats extends Model {
 
    static fields = {
       id: { primaryKey: true, autoIncrement: true },
-      hiddensubscribercount: DataTypes.BOOLEAN,
-      viewcount: DataTypes.INTEGER,
-      subscribercount: DataTypes.INTEGER,
-      videocount: DataTypes.INTEGER,
-      YoutubeChannelId: DataTypes.INTEGER,
+      hiddenSubscriberCount: DataTypes.BOOLEAN,
+      viewCount: DataTypes.INTEGER,
+      subscriberCount: DataTypes.INTEGER,
+      videoCount: DataTypes.INTEGER,
    };
    static channel() {
       return this.hasOne(YoutubeChannel);
@@ -98,14 +98,23 @@ export async function refreshYoutube() {
 export async function refreshYoutubeStats() {
    const youtubeChannels: YoutubeChannel[] = await YoutubeChannel.all();
    for (const channel of youtubeChannels) {
-      logger.debug(`Getting stats for channel: ${channel.channelName}`)
-      /* const stats = await Promise.resolve();
-      const youtubeChannelStats = new YoutubeChannelStats();
-      youtubeChannelStats.hiddensubscribercount = stats.hiddensubscribercount;
-      youtubeChannelStats.viewcount = stats.viewcount;
-      youtubeChannelStats.subscribercount = stats.subscribercount;
-      youtubeChannelStats.videocount = stats.videocount;
-      youtubeChannelStats.YoutubeChannelId = channel.id;
-      youtubeChannelStats.save(); */
+      try {
+         logger.debug(`Getting stats for channel: ${channel.channelName}`)
+         const youtubeJson = await fetchJsonData(`https://youtube.googleapis.com/youtube/v3/channels?part=statistics&key=${Credentials.google.appKey}&id=${channel.id}`)
+         if (youtubeJson && youtubeJson.items && youtubeJson.items[0] && youtubeJson.items[0].statistics) {
+            const youtubeChannelStats = new YoutubeChannelStats();
+            youtubeChannelStats.hiddenSubscriberCount = youtubeJson.items[0].statistics.hiddenSubscriberCount;
+            youtubeChannelStats.viewCount = youtubeJson.items[0].statistics.viewCount;
+            youtubeChannelStats.subscriberCount = youtubeJson.items[0].statistics.subscriberCount;
+            youtubeChannelStats.videoCount = youtubeJson.items[0].statistics.videoCount;
+            youtubeChannelStats.youtubechannelId = channel.id;
+            await youtubeChannelStats.save();
+            logger.debug(youtubeChannelStats)
+         }
+      } catch (error) {
+         logger.error(`Erro ao actualizar as estatísticas de Youtube`);
+         logger.error(error);
+      }
    }
+   logger.info(`Gardadas as estatísticas de ${youtubeChannels.length} canles de YouTube.`)
 }
