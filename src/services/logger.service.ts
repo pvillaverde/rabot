@@ -21,6 +21,7 @@ await log.setup({
       publishService: { level: "DEBUG", handlers: ["console", "file"], },
       discordService: { level: "DEBUG", handlers: ["console", "file"], },
       agendaService: { level: "DEBUG", handlers: ["console", "file"], },
+      twitchService: { level: "DEBUG", handlers: ["console", "file"], },
    },
 });
 

@@ -1,4 +1,4 @@
-import moment from "npm:moment";
+import { moment } from "../deps.ts";
 import { fetchJsonData } from "./utils.service.ts";
 import { Config, Credentials } from "../config.ts";
 import log from "./logger.service.ts";

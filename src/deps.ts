@@ -20,8 +20,9 @@ import rssParser from "npm:rss-parser";
 export { rssParser };
 
 export { readLines } from "https://deno.land/std@0.78.0/io/mod.ts";
-import moment from "https://deno.land/x/momentjs@2.29.1-deno/mod.ts";
+import moment from "npm:moment";
 export { moment };
+export { Axios } from "npm:axios";
 
 
 /** Other dependencies */
