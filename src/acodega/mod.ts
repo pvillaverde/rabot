@@ -1,7 +1,7 @@
-import log from "../services/logger.service.ts";
-import { Database, SQLite3Connector } from "https://deno.land/x/denodb@v1.2.0/mod.ts";
+import { Database, SQLite3Connector } from "../deps.ts";
 import { refreshYoutube, YoutubeChannel, YoutubeChannelStats } from "./youtube.ts";
 import { refreshPodcast, PodcastChannel } from "./podcast.ts";
+import log from "../services/logger.service.ts";
 export const logger = log.getLogger('acodegaService');
 
 export interface BaseChannelData {

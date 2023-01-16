@@ -1,4 +1,4 @@
-import { sendMessage, editMessage, BigString, EditMessage, CreateMessage } from "../deps.ts";
+import { sendMessage, editMessage, BigString, EditMessage, CreateMessage } from "../../deps.ts";
 import { DiscordBot, logger, targetChannels } from "../mod.ts";
 
 export async function sendMessageToDiscordChannels(platform: "galegotube" | "galegotwitch" | "podgalego", content: string) {
@@ -24,4 +24,5 @@ export async function updateOrSendMessage(message: CreateMessage | EditMessage, 
          logger.error(error);
       }
    }
+   return;
 }

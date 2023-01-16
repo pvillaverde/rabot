@@ -1,10 +1,10 @@
+import { DataTypes, Model } from "../deps.ts";
 import { logger, BaseChannelData } from "./mod.ts";
 import { publish } from "../services/publish.service.ts";
-import { DataTypes, Model } from "https://deno.land/x/denodb@v1.2.0/mod.ts";
 import { fetchJsonData, getFeedData } from "../services/utils.service.ts";
 
 export class PodcastChannel extends Model {
-   static table = 'podcast_channel';
+   static table = 'podcast_channels';
    static timestamps = true; // adds created_at and updated_at fields
 
    static fields = {

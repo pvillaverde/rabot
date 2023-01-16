@@ -1,4 +1,4 @@
-import { cron, everyMinute, every15Minute, hourly, daily } from "https://deno.land/x/deno_cron@v1.0.0/cron.ts";
+import { cron, everyMinute, every15Minute, hourly, daily } from "./deps.ts";
 import { refreshData } from "./acodega/mod.ts";
 import { refreshYoutubeStats } from "./acodega/youtube.ts";
 import startDiscordBot from "./bot/mod.ts";

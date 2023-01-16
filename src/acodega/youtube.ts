@@ -1,11 +1,12 @@
+
+import { DataTypes, Model, Relationships } from "../deps.ts";
 import { logger, BaseChannelData } from "./mod.ts";
 import { fetchJsonData, getFeedData } from "../services/utils.service.ts";
 import { publish } from "../services/publish.service.ts";
-import { DataTypes, Model, Relationships } from "https://deno.land/x/denodb@v1.2.0/mod.ts";
 import { Credentials } from "../config.ts";
 
 export class YoutubeChannel extends Model {
-   static table = 'youtube_channel';
+   static table = 'youtube_channels';
    static timestamps = true; // adds created_at and updated_at fields
 
    static fields = {

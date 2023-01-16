@@ -44,7 +44,7 @@ export const Credentials: Credentials = {
 }
 export const Config = {
    logger: {
-      ConsoleLogLevel: Deno.env.get("RABOT_CONSOLE_LOG_LEVELE") as "NOTSET" | "DEBUG" | "INFO" | "WARNING" | "ERROR" | "CRITICAL",
+      ConsoleLogLevel: Deno.env.get("RABOT_CONSOLE_LOG_LEVEL") as "NOTSET" | "DEBUG" | "INFO" | "WARNING" | "ERROR" | "CRITICAL",
    },
    axenda: {
       calendarId: "galegotwitch@gmail.com",
@@ -72,6 +72,6 @@ export const Config = {
       twitter: false,
       discord: true,
       discordChannelName: "🔊podgalego",
-      messageTemplate: '🤖🔊 {channelName}{mentionUser} acaba de publicar un nodo falangullo : "{title}" #PodGalego. Podes escoitalo en\n{url}'
+      messageTemplate: '🤖🔊 {channelName}{mentionUser} acaba de publicar un novo falangullo : "{title}" #PodGalego. Podes escoitalo en\n{url}'
    },
 };

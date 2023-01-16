@@ -1,6 +1,6 @@
 import log from "./logger.service.ts";
+import { rssParser } from "../deps.ts";
 
-import rssParser from "npm:rss-parser";
 const feedParser = new rssParser({
    customFields: {
       feed: ['published'],

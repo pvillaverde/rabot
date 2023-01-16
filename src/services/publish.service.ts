@@ -1,6 +1,5 @@
 import log from "./logger.service.ts";
-import { login } from 'npm:masto';
-import { TwitterApi } from 'npm:twitter-api-v2';
+import { login, TwitterApi } from '../deps.ts';
 import { Config, Credentials } from '../config.ts';
 import { sendMessageToDiscordChannels } from '../bot/utils/helpers.ts';
 import { PodcastChannelData } from '../acodega/podcast.ts';

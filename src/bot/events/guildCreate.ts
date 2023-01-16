@@ -1,7 +1,7 @@
 import { events } from "./mod.ts";
 import { Config } from "../../config.ts";
 import { DiscordBot, logger, targetChannels } from "../mod.ts";
-import { Guild, Channel, Bot, sendMessage, getDmChannel, hasChannelPermissions, Member } from "../deps.ts";
+import { Guild, Channel, Bot, sendMessage, getDmChannel, hasChannelPermissions, Member } from "../../deps.ts";
 
 events.guildCreate = (bot: Bot, guild: Guild) => {
    logger.info(`Joined new server: ${guild.name}`)

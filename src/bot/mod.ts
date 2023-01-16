@@ -1,4 +1,4 @@
-import { createBot, Intents, startBot, Channel, enableCachePlugin, enableCacheSweepers, enablePermissionsPlugin } from "./deps.ts";
+import { createBot, Intents, startBot, Channel, enableCachePlugin, enableCacheSweepers, enablePermissionsPlugin } from "../deps.ts";
 import { Credentials } from "../config.ts";
 import { events } from "./events/mod.ts";
 import log from "../services/logger.service.ts";
