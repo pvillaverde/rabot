@@ -47,6 +47,7 @@ export const Config = {
       ConsoleLogLevel: Deno.env.get("RABOT_CONSOLE_LOG_LEVEL") as "NOTSET" | "DEBUG" | "INFO" | "WARNING" | "ERROR" | "CRITICAL",
    },
    axenda: {
+      enable: true,
       calendarId: "galegotwitch@gmail.com",
       discordChannelId: "796338134542974986",
       discordChannelMessageId: "1064315573732905051",

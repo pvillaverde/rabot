@@ -13,6 +13,7 @@ interface agendaField {
 }
 
 export async function refreshAgenda() {
+   if (!Config.axenda.enable) return;
    const fields: agendaField[] = [];
    const day = moment();
    while (moment(day).diff(moment(), 'days') < Config.axenda.days) {
@@ -22,7 +23,7 @@ export async function refreshAgenda() {
       });
       day.add(1, 'day');
    }
-   updateCalendar(fields);
+   return await updateCalendar(fields);
 }
 
 /**
