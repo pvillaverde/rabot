@@ -9,7 +9,8 @@
       ]
    },
    "tasks": {
-      "rabot": "deno run --allow-write --allow-read --allow-env --allow-net src/main.ts"
+      "rabot": "deno run --allow-write --allow-read --allow-env --allow-net src/main.ts",
+      "healthcheck": "deno run --allow-read --allow-env --allow-net src/healthcheck.ts"
    },
    "lint": {
       "files": {
