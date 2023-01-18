@@ -7,6 +7,7 @@ events.guildCreate = (bot: Bot, guild: Guild) => {
    logger.info(`Joined new server: ${guild.name}`)
 
    for (const platform of (Object.keys(targetChannels) as ("galegotube" | "galegotwitch" | "podgalego")[])) {
+      if (!Config[platform].discord) continue;
       const channelName = Config[platform].discordChannelName;
       const targetChannel = guild.channels.find((c: Channel) => c.name === channelName);
       if (!targetChannel) {

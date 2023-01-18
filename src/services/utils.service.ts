@@ -25,3 +25,13 @@ export async function fetchJsonData(url: string) {
    const response = await fetch(url);
    return await response.json();
 }
+
+/**
+ * Chunks an array into smaller arrays of a specified size
+ * @param {Array} arr - The array to be chunked
+ * @param {number} size - The size of each chunk
+ * @returns {Array} - An array of smaller arrays (chunks)
+ */
+export function splitInChunks(arr: any[], size: number) {
+   return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) => arr.slice(i * size, i * size + size));
+}
