@@ -8,7 +8,7 @@ export class PodcastChannel extends Model {
    static timestamps = true; // adds created_at and updated_at fields
 
    static fields = {
-      id: { primaryKey: true, autoIncrement: false, type: DataTypes.STRING },
+      rss: { primaryKey: true, autoIncrement: false, type: DataTypes.STRING },
       channelName: DataTypes.STRING,
       channelDate: DataTypes.DATETIME,
       type: DataTypes.STRING,
@@ -51,7 +51,7 @@ export async function refreshPodcast() {
          let currentChannel = await PodcastChannel.find(channel.rss)
          if (!currentChannel) {
             currentChannel = new PodcastChannel();
-            currentChannel.id = channel.rss;
+            currentChannel.rss = channel.rss;
             currentChannel.channelName = channel.title;
             currentChannel.channelDate = feedData?.published || new Date();
             currentChannel.twitter = channel.twitter as string;

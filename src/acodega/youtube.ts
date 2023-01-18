@@ -10,7 +10,7 @@ export class YoutubeChannel extends Model {
    static timestamps = true; // adds created_at and updated_at fields
 
    static fields = {
-      id: { primaryKey: true, autoIncrement: false, type: DataTypes.STRING },
+      channelUuid: { primaryKey: true, autoIncrement: false, type: DataTypes.STRING },
       channelName: DataTypes.STRING,
       channelDate: DataTypes.DATETIME,
       type: DataTypes.STRING,
@@ -31,7 +31,7 @@ export class YoutubeChannelStats extends Model {
    static timestamps = true; // adds created_at and updated_at fields
 
    static fields = {
-      id: { primaryKey: true, autoIncrement: true },
+      channelStatsId: { primaryKey: true, autoIncrement: true },
       hiddenSubscriberCount: DataTypes.BOOLEAN,
       viewCount: DataTypes.INTEGER,
       subscriberCount: DataTypes.INTEGER,
@@ -70,7 +70,7 @@ export async function refreshYoutube() {
          let currentChannel = await YoutubeChannel.find(channel.youtube)
          if (!currentChannel) {
             currentChannel = new YoutubeChannel();
-            currentChannel.id = channel.youtube;
+            currentChannel.channelUuid = channel.youtube;
             currentChannel.channelName = channel.title;
             currentChannel.channelDate = feedData?.published || new Date();
             currentChannel.twitter = channel.twitter as string;
@@ -109,7 +109,7 @@ export async function refreshYoutubeStats() {
             youtubeChannelStats.viewCount = youtubeJson.items[0].statistics.viewCount;
             youtubeChannelStats.subscriberCount = youtubeJson.items[0].statistics.subscriberCount;
             youtubeChannelStats.videoCount = youtubeJson.items[0].statistics.videoCount;
-            youtubeChannelStats.youtubechannelId = channel.id;
+            youtubeChannelStats.youtubechannelId = channel.channelUuid;
             await youtubeChannelStats.save();
             logger.debug(youtubeChannelStats)
          }

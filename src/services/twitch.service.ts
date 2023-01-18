@@ -1,9 +1,22 @@
 import { Axios } from "../deps.ts";
 import { Credentials } from "../config.ts";
 import log from "./logger.service.ts";
+import { splitInChunks } from "./utils.service.ts";
 
 const logger = log.getLogger('twitchService');
-const axios = new Axios();
+const axios = new Axios({
+   baseURL: "https://api.twitch.tv/helix/",
+   // return JSONs
+   transformResponse: (data, _headers) => JSON.parse(data),
+   headers: {
+      'Client-ID': Credentials.twitch.client_id,
+   },
+});
+// throw errors
+axios.interceptors.response.use(response => {
+   if (response.status >= 400) throw response.data;
+   return response;
+});
 /* JSON.parse(Deno.env.get("RABOT_GOOGLE_CREDENTIALS") as string), */
 
 /**
@@ -20,9 +33,7 @@ function getRequestOptions() {
    }
    // Construct default request options
    return {
-      baseURL: 'https://api.twitch.tv/helix/',
       headers: {
-         'Client-ID': Credentials.twitch.client_id,
          Authorization: `Bearer ${oauthBearer}`,
       },
    };
@@ -35,7 +46,7 @@ function getRequestOptions() {
  * @throws {any} - Rejects the promise and throws the error if the error status is not 401.
  */
 async function handleErrorStatus(error: any): Promise<any> {
-   if (error.response && error.response.status === 401) {
+   if (error && error.status === 401) {
       try {
          return await getAccessToken();
       } catch (_error) { /* */ }
@@ -44,20 +55,11 @@ async function handleErrorStatus(error: any): Promise<any> {
    throw error;
 }
 
-/**
- * Chunks an array into smaller arrays of a specified size
- * @param {Array} arr - The array to be chunked
- * @param {number} size - The size of each chunk
- * @returns {Array} - An array of smaller arrays (chunks)
- */
-function splitInChunks(arr: any[], size: number) {
-   return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) => arr.slice(i * size, i * size + size));
-}
-
 /** Refresh access token from Twitch API
  * @returns Object with access_token.
  */
 async function getAccessToken() {
+   logger.warning("Refreshing twitch access token")
    try {
       const url = `https://id.twitch.tv/oauth2/token?client_id=${Credentials.twitch.client_id}&client_secret=${Credentials.twitch.client_secret}&grant_type=client_credentials`;
       const response = await axios.post(url);
@@ -70,7 +72,7 @@ async function getAccessToken() {
    }
 }
 
-interface TwitchUserData {
+export interface TwitchUserData {
    id: string;
    login: string;
    display_name: string;
@@ -78,8 +80,8 @@ interface TwitchUserData {
    broadcaster_type: string;
    description: string;
    profile_image_url: string;
-   offline_image_urk: string;
-   channel_created_at: Date;
+   offline_image_url: string;
+   created_at: Date;
    view_count: number;
 }
 
@@ -93,13 +95,11 @@ export async function fetchUsers(channelNames: string[]): Promise<TwitchUserData
    const maxPerRequest = 100;
    const channelsInChunks = splitInChunks(channelNames, maxPerRequest);
    try {
-      const requests = channelsInChunks.map((cNames: string[]) =>
-         axios.get(`/users?login=${cNames.join('&login=')}`, getRequestOptions()));
-      const responses = await Promise.all(requests);
-      // get the data array from each response
-      const responsesUsersData: TwitchUserData[][] = responses.map(response => response.data.data || []);
-      // flatten the array of arrays into a single array
-      const users = responsesUsersData.reduce((array, data) => array.concat(data), []);
+      let users: TwitchUserData[] = [];
+      for (const cNames of channelsInChunks) {
+         const response = await axios.get(`/users?login=${cNames.join('&login=')}`, getRequestOptions());
+         users = users.concat(response.data.data || []);
+      }
       return users;
    } catch (error) {
       return handleErrorStatus(error)
@@ -108,7 +108,7 @@ export async function fetchUsers(channelNames: string[]): Promise<TwitchUserData
    }
 }
 
-interface TwitchStreamData {
+export interface TwitchStreamData {
    id: string;
    user_id: string;
    user_login: string;
@@ -146,7 +146,7 @@ export async function fetchStreams(channelNames: string[]): Promise<TwitchStream
    }
 }
 
-interface TwitchGameData {
+export interface TwitchGameData {
    id: string;
    name: string;
    box_art_url: string,
@@ -168,7 +168,7 @@ export async function fetchGames(gameIds: string[]): Promise<TwitchGameData[]> {
    }
 }
 
-interface TwitchFollowersData {
+export interface TwitchFollowersData {
    viewCount: number;
    followCount: number;
    from_id: string;
@@ -178,6 +178,8 @@ interface TwitchFollowersData {
    to_login: string;
    to_name: string;
    followed_at: Date;
+
+   twitchchannelId?: string;
 }
 /**
  * Fetch channel followers from Twitch API
@@ -186,7 +188,7 @@ interface TwitchFollowersData {
  * @param {TwitchFollowersData[]} previousQueryFollowers - The followers data from previous queries
  * @returns {Promise<TwitchFollowersData[]>} - A promise that resolves to an array of followers data objects
  */
-export async function fetchChannelFollowers(channelId: string, cursor: string, previousQueryFollowers: TwitchFollowersData[] = []): Promise<TwitchFollowersData[]> {
+export async function fetchChannelFollowers(channelId: string, cursor?: string, previousQueryFollowers: TwitchFollowersData[] = []): Promise<TwitchFollowersData[]> {
    // Set pagination cursor
    const pagination = cursor ? `&after=${cursor}` : '';
    try {
@@ -205,16 +207,20 @@ export async function fetchChannelFollowers(channelId: string, cursor: string, p
    }
 }
 
-interface TwitchClipData {
-   viewCount: number;
-   followCount: number;
-   from_id: string;
-   from_login: string;
-   from_name: string;
-   to_id: string;
-   to_login: string;
-   to_name: string;
-   followed_at: Date;
+export interface TwitchClipData {
+   id: string;
+   url: string;
+   embed_url: string;
+   broadcaster_id: string;
+   broadcaster_name: string;
+   creator_id: string;
+   creator_name: string;
+   game_id: string;
+   language: string;
+   title: string;
+   view_count: number;
+   created_at: Date;
+   thumbnail_url: string;
 }
 /**
  * Fetch clips from Twitch API
@@ -223,7 +229,7 @@ interface TwitchClipData {
  * @param {TwitchClipData[]} previousQueryClips - The clips data from previous queries
  * @returns {Promise<TwitchClipData[]>} - A promise that resolves to an array of clips data objects
  */
-export async function fetchClips(broadcasterId: string, cursor: string, previousQueryClips: TwitchClipData[] = []): Promise<TwitchClipData[]> {
+export async function fetchClips(broadcasterId: string, cursor?: string, previousQueryClips: TwitchClipData[] = []): Promise<TwitchClipData[]> {
    // Set pagination cursor
    const pagination = cursor ? `&after=${cursor}` : '';
    try {
