@@ -10,15 +10,15 @@ export class YoutubeChannel extends Model {
    static timestamps = true; // adds created_at and updated_at fields
 
    static fields = {
-      channelUuid: { primaryKey: true, autoIncrement: false, type: DataTypes.STRING },
-      channelName: DataTypes.STRING,
-      channelDate: DataTypes.DATETIME,
+      channel_uuid: { primaryKey: true, autoIncrement: false, type: DataTypes.STRING },
+      channel_name: DataTypes.STRING,
+      channel_date: DataTypes.DATETIME,
       type: DataTypes.STRING,
       twitter: { type: DataTypes.STRING, allowNull: true },
       mastodon: { type: DataTypes.STRING, allowNull: true },
-      lastVideoDate: { type: DataTypes.DATETIME, allowNull: true },
-      lastVideoTitle: { type: DataTypes.STRING, allowNull: true },
-      lastVideoLink: { type: DataTypes.STRING, allowNull: true },
+      last_video_date: { type: DataTypes.DATETIME, allowNull: true },
+      last_video_title: { type: DataTypes.STRING, allowNull: true },
+      last_video_link: { type: DataTypes.STRING, allowNull: true },
    };
 
    static defaults = {
@@ -70,24 +70,24 @@ export async function refreshYoutube() {
          let currentChannel = await YoutubeChannel.find(channel.youtube)
          if (!currentChannel) {
             currentChannel = new YoutubeChannel();
-            currentChannel.channelUuid = channel.youtube;
-            currentChannel.channelName = channel.title;
-            currentChannel.channelDate = feedData?.published || new Date();
+            currentChannel.channel_uuid = channel.youtube;
+            currentChannel.channel_name = channel.title;
+            currentChannel.channel_date = feedData?.published || new Date();
             currentChannel.twitter = channel.twitter as string;
             currentChannel.mastodon = channel.mastodon as string;
             await currentChannel.save();
          }
          // Se ten último vídeo e é distinto do último que recuperou RABOT, publica nas canles que toque.
-         if (channel.lastFeedEntry && currentChannel.lastVideoDate && new Date(currentChannel.lastVideoDate as Date) < new Date(channel.lastFeedEntry.published as string)) {
+         if (channel.lastFeedEntry && currentChannel.last_video_date && new Date(currentChannel.last_video_date as Date) < new Date(channel.lastFeedEntry.published as string)) {
             publish(channel);
          }
-         currentChannel.channelName = channel.title;
-         currentChannel.channelDate = feedData?.published || new Date();
+         currentChannel.channel_name = channel.title;
+         currentChannel.channel_date = feedData?.published || new Date();
          currentChannel.twitter = channel.twitter as string;
          currentChannel.mastodon = channel.mastodon as string;
-         currentChannel.lastVideoDate = channel.lastFeedEntry?.published as string;
-         currentChannel.lastVideoTitle = channel.lastFeedEntry?.title as string;
-         currentChannel.lastVideoLink = channel.lastFeedEntry?.link as string;
+         currentChannel.last_video_date = channel.lastFeedEntry?.published as string;
+         currentChannel.last_video_title = channel.lastFeedEntry?.title as string;
+         currentChannel.last_video_link = channel.lastFeedEntry?.link as string;
          await currentChannel.update();
          logger.debug(currentChannel);
       }
@@ -101,7 +101,7 @@ export async function refreshYoutubeStats() {
    const youtubeChannels: YoutubeChannel[] = await YoutubeChannel.all();
    for (const channel of youtubeChannels) {
       try {
-         logger.debug(`Getting stats for channel: ${channel.channelName}`)
+         logger.debug(`Getting stats for channel: ${channel.channel_name}`)
          const youtubeJson = await fetchJsonData(`https://youtube.googleapis.com/youtube/v3/channels?part=statistics&key=${Credentials.google.appKey}&id=${channel.id}`)
          if (youtubeJson && youtubeJson.items && youtubeJson.items[0] && youtubeJson.items[0].statistics) {
             const youtubeChannelStats = new YoutubeChannelStats();
@@ -109,7 +109,7 @@ export async function refreshYoutubeStats() {
             youtubeChannelStats.viewCount = youtubeJson.items[0].statistics.viewCount;
             youtubeChannelStats.subscriberCount = youtubeJson.items[0].statistics.subscriberCount;
             youtubeChannelStats.videoCount = youtubeJson.items[0].statistics.videoCount;
-            youtubeChannelStats.youtubechannelId = channel.channelUuid;
+            youtubeChannelStats.youtubechannelId = channel.channel_uuid;
             await youtubeChannelStats.save();
             logger.debug(youtubeChannelStats)
          }

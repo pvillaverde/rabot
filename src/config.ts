@@ -47,7 +47,7 @@ export const Credentials: Credentials = {
    galegotube: JSON.parse(Deno.env.get("RABOT_GALEGOTUBE_CREDENTIALS") as string),
    galegotwitch: JSON.parse(Deno.env.get("RABOT_GALEGOTWITCH_CREDENTIALS") as string),
    podgalego: JSON.parse(Deno.env.get("RABOT_PODGALEGO_CREDENTIALS") as string),
-   /* postgresql: JSON.parse(Deno.env.get("RABOT_POSTGRESQL_CREDENTIALS") as string), */
+   postgresql: JSON.parse(Deno.env.get("RABOT_POSTGRESQL_CREDENTIALS") as string),
 }
 export const Config = {
    logger: {

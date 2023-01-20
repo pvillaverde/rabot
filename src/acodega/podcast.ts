@@ -9,14 +9,14 @@ export class PodcastChannel extends Model {
 
    static fields = {
       rss: { primaryKey: true, autoIncrement: false, type: DataTypes.STRING },
-      channelName: DataTypes.STRING,
-      channelDate: DataTypes.DATETIME,
+      channel_name: DataTypes.STRING,
+      channel_date: DataTypes.DATETIME,
       type: DataTypes.STRING,
       twitter: { type: DataTypes.STRING, allowNull: true },
       mastodon: { type: DataTypes.STRING, allowNull: true },
-      lastPodcastDate: { type: DataTypes.DATETIME, allowNull: true },
-      lastPodcastTitle: { type: DataTypes.STRING, allowNull: true },
-      lastPodcastLink: { type: DataTypes.STRING, allowNull: true },
+      last_podcast_date: { type: DataTypes.DATETIME, allowNull: true },
+      last_podcast_title: { type: DataTypes.STRING, allowNull: true },
+      last_podcast_link: { type: DataTypes.STRING, allowNull: true },
    };
 
    static defaults = {
@@ -52,23 +52,23 @@ export async function refreshPodcast() {
          if (!currentChannel) {
             currentChannel = new PodcastChannel();
             currentChannel.rss = channel.rss;
-            currentChannel.channelName = channel.title;
-            currentChannel.channelDate = feedData?.published || new Date();
+            currentChannel.channel_name = channel.title;
+            currentChannel.channel_date = feedData?.published || new Date();
             currentChannel.twitter = channel.twitter as string;
             currentChannel.mastodon = channel.mastodon as string;
             await currentChannel.save();
          }
          // Se ten último podcast e é distinto do último que recuperou RABOT, publica nas canles que toque.
-         if (channel.lastFeedEntry && currentChannel.lastPodcastDate && new Date(currentChannel.lastPodcastDate as Date) < new Date(channel.lastFeedEntry.published as string)) {
+         if (channel.lastFeedEntry && currentChannel.last_podcast_date && new Date(currentChannel.last_podcast_date as Date) < new Date(channel.lastFeedEntry.published as string)) {
             publish(channel);
          }
-         currentChannel.channelName = channel.title;
-         currentChannel.channelDate = feedData?.published || new Date();
+         currentChannel.channel_name = channel.title;
+         currentChannel.channel_date = feedData?.published || new Date();
          currentChannel.twitter = channel.twitter as string;
          currentChannel.mastodon = channel.mastodon as string;
-         currentChannel.lastPodcastDate = channel.lastFeedEntry?.published as string;
-         currentChannel.lastPodcastTitle = channel.lastFeedEntry?.title as string;
-         currentChannel.lastPodcastLink = channel.lastFeedEntry?.link as string;
+         currentChannel.last_podcast_date = channel.lastFeedEntry?.published as string;
+         currentChannel.last_podcast_title = channel.lastFeedEntry?.title as string;
+         currentChannel.last_podcast_link = channel.lastFeedEntry?.link as string;
          await currentChannel.update();
          logger.debug(currentChannel);
       }

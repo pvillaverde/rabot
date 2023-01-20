@@ -3,7 +3,7 @@ import { refreshYoutube, YoutubeChannel, YoutubeChannelStats } from "./youtube.t
 import { refreshPodcast, PodcastChannel } from "./podcast.ts";
 import log from "../services/logger.service.ts";
 import { Credentials } from "../config.ts";
-import { TwitchChannel, TwitchChannelFollows, TwitchChannelStats, TwitchClip, TwitchGame, TwitchStream, TwitchStreamViews } from "./twitch.ts";
+import { refreshTwitch, TwitchChannel, TwitchChannelFollows, TwitchChannelStats, TwitchClip, TwitchGame, TwitchStream, TwitchStreamViews } from "./twitch.ts";
 export const logger = log.getLogger('acodegaService');
 
 export interface BaseChannelData {
@@ -18,13 +18,13 @@ export interface BaseChannelData {
 }
 const connector = Credentials.postgresql ? new PostgresConnector(Credentials.postgresql) : new SQLite3Connector({ filepath: './data/acodega.sqlite', });
 
-const db = new Database(connector);
+const db = new Database({ connector, debug: false });
 
 
 db.link([YoutubeChannel, YoutubeChannelStats, PodcastChannel, TwitchChannel, TwitchChannelStats, TwitchChannelFollows, TwitchStream, TwitchStreamViews, TwitchClip, TwitchGame]);
 
 // Coa opción de drop, está borrando as táboas antes de cargar os datos. Ollo con usar isto en produción.
-await db.sync({ drop: false });
+/* await db.sync({ drop: true }); */
 
 /** Refresca os datos de todas as plataformas. */
 export async function refreshData() {
@@ -32,6 +32,6 @@ export async function refreshData() {
    return await Promise.all([
       refreshPodcast(),
       refreshYoutube(),
-      /* refreshTwitch() */
+      refreshTwitch()
    ]);
 }
