@@ -1,10 +1,14 @@
 import { DataTypes, Model, Relationships } from "../deps.ts";
 import { logger, BaseChannelData } from "./mod.ts";
 import { fetchJsonData, splitInChunks } from "../services/utils.service.ts";
-import { publish } from "../services/publish.service.ts";
-import { fetchChannelFollowers, fetchClips, fetchGames, fetchUsers, TwitchClipData, TwitchFollowersData, TwitchGameData, TwitchUserData } from "../services/twitch.service.ts";
+import { fetchChannelFollowers, fetchClips, fetchGames, fetchStreams, fetchUsers, TwitchClipData, TwitchFollowersData, TwitchGameData, TwitchUserData } from "../services/twitch.service.ts";
+import { createLiveEmbedForStream, getidString, updateOrSendMessage } from "../bot/utils/helpers.ts";
+import { targetChannels } from "../bot/mod.ts";
 
-interface Values { [key: string]: any };
+interface Values { [key: string]: any }
+type FieldValue = number | string | boolean | Date | null;
+type Operator = ">" | ">=" | "<" | "<=" | "=" | "like";
+
 export class TwitchChannel extends Model {
    static table = 'twitch_channels';
    static timestamps = true; // adds created_at and updated_at fields
@@ -37,8 +41,8 @@ export class TwitchChannelStats extends Model {
 
    static fields = {
       stats_id: { primaryKey: true, autoIncrement: true },
-      viewCount: DataTypes.INTEGER,
-      followCount: DataTypes.INTEGER,
+      view_count: DataTypes.INTEGER,
+      follow_count: DataTypes.INTEGER,
    };
    static channel() {
       return this.hasOne(TwitchChannel);
@@ -68,6 +72,7 @@ export class TwitchStream extends Model {
 
    static fields = {
       stream_id: { primaryKey: true, autoIncrement: false, type: DataTypes.STRING },
+      type: { type: DataTypes.STRING, allowNull: true },
       user_id: { type: DataTypes.STRING, allowNull: true },
       user_login: { type: DataTypes.STRING, allowNull: true },
       user_name: { type: DataTypes.STRING, allowNull: true },
@@ -77,8 +82,17 @@ export class TwitchStream extends Model {
       viewer_count: { type: DataTypes.INTEGER, allowNull: true },
       started_at: DataTypes.TIMESTAMP,
       ended_at: DataTypes.TIMESTAMP,
+      language: { type: DataTypes.STRING, allowNull: true },
+      tags: { type: DataTypes.STRING, allowNull: true },
+      is_mature: { type: DataTypes.BOOLEAN, allowNull: true },
       live_messages: { type: DataTypes.TEXT, allowNull: true },
    };
+   static channel() {
+      return this.hasOne(TwitchChannel);
+   }
+   static game(id: string) {
+      return TwitchGame.find(id);
+   }
 }
 export class TwitchStreamViews extends Model {
    static table = 'twitch_stream_views';
@@ -86,7 +100,7 @@ export class TwitchStreamViews extends Model {
 
    static fields = {
       streamview_id: { primaryKey: true, autoIncrement: true },
-      viewCount: DataTypes.INTEGER,
+      view_count: DataTypes.INTEGER,
    };
    static stream() {
       return this.hasOne(TwitchStream);
@@ -185,10 +199,80 @@ export async function refreshTwitch() {
 /** Refrescar os streams: Cada minuto ir ver que canles están en directo e actualizar con iso a información do directo e as visualizacións */
 export async function refreshStreams() {
    const currentChannels = await TwitchChannel.where('disabled', false).all();
-   // Cos nomes das canlees actuais, buscar os streams que están actualmente en emisión.
-   // Se o stream é novo, enviar unha notificación inicial.
-   // Se o stream non é novo, actualizar a mensaxe do discord.
-   // Crear ou actualizar os datos do Stream.
+   // Cos nomes das canles actuais, buscar os streams que están actualmente en emisión.
+   const channelNames = currentChannels.map(c => c.login as string);
+   const currentStreams = await fetchStreams(channelNames);
+   for (const stream of currentStreams) {
+      // TODO: Posible Bug. Cando o stream cae e o volves levantar, a ID do stream é distinta, pero o usuario que emite non.
+      let currentStream = await TwitchStream.find(stream.id)
+      if (!currentStream) {
+         // Crear o novo Stream
+         currentStream = new TwitchStream();
+         currentStream.stream_id = stream.id;
+         currentStream.user_id = stream.user_id;
+         currentStream.type = stream.type;
+         currentStream.user_login = stream.user_login;
+         currentStream.user_name = stream.user_name;
+         currentStream.game_id = stream.game_id;
+         currentStream.game_name = stream.game_name;
+         currentStream.title = stream.title;
+         currentStream.game_id = stream.game_id;
+         currentStream.viewer_count = stream.viewer_count;
+         currentStream.started_at = stream.started_at;
+         currentStream.ended_at = new Date().toISOString();
+         currentStream.language = stream.language;
+         currentStream.tags = stream.tags.join(',');
+         currentStream.is_mature = stream.is_mature;
+         currentStream.twitchchannelId = stream.user_id;
+         await currentStream.save();
+      } else {
+         // Actualizar o stream existente
+         currentStream.game_id = stream.game_id;
+         currentStream.type = stream.type;
+         currentStream.game_name = stream.game_name;
+         currentStream.title = stream.title;
+         currentStream.viewer_count = stream.viewer_count;
+         currentStream.ended_at = new Date();
+         await currentStream.update();
+      }
+      logger.warning(`--------${currentStream.started_at} - ${currentStream.ended_at}`)
+      // Crear rexistro cos espectadores que ten neste momento.
+      const streamViews = new TwitchStreamViews();
+      streamViews.view_count = currentStream.viewer_count;
+      streamViews.twitchstreamId = currentStream.stream_id;
+      await streamViews.save();
+   }
+   const activeStreams = await TwitchStream.where('type', "live").all();
+   for (const stream of activeStreams) {
+      console.log(stream.started_at, stream.ended_at, stream.createdAt, stream.updatedAt);
+      logger.warning(`${stream.started_at} - ${stream.ended_at}`)
+      const channel = await TwitchChannel.find(stream.user_id as string);
+      const game = await TwitchGame.find(stream.game_id as string);
+      let liveMessages: Values = {}
+      try {
+         if (!stream.live_messages) throw undefined;
+         liveMessages = JSON.parse(stream.live_messages as string);
+         logger.info(`Actualizando o directo da canle ${stream.user_name} =>  ${stream.game_name}: ${stream.title}`)
+      } catch (_error) {
+         liveMessages = {};
+         logger.info(`A canle ${stream.user_name} comezou a emitir ${stream.game_name}: ${stream.title}`)
+      }
+      if (new Date(stream.ended_at as Date) <= new Date(Date.now() - 1000 * 60 * 60)) {
+         logger.warning(`Directo posiblemente offline: o directo da canle ${stream.user_name} =>  ${stream.game_name}: ${stream.title}`)
+         stream.type = "offline";
+      }
+      const message = { embeds: [createLiveEmbedForStream(stream, channel, game)] };
+      for (const discordChannel of targetChannels.galegotwitch) {
+         const channelId = getidString(discordChannel.id);
+         const discordMessage = await updateOrSendMessage(message as any, channelId, liveMessages[channelId]);
+         if (discordMessage) {
+            liveMessages[channelId] = getidString(discordMessage.id);
+         }
+      }
+      stream.live_messages = JSON.stringify(liveMessages);
+      await stream.update();
+      logger.warning(`${stream.started_at} - ${stream.ended_at}`)
+   }
    // Co listado de streams que tiñamos activo, comprobar os que xa non están en directo. Se xan on o están, actualizar o directo coa data de fin e cerrar a notificación de discord.
 }
 /**
@@ -204,8 +288,8 @@ export async function refreshFollowers() {
       followers = followers.concat(channelFollowers);
       // Gardamos as estatísticas da canle.
       const stats = new TwitchChannelStats();
-      stats.viewCount = channel.view_count;
-      stats.followCount = channelFollowers.length;
+      stats.view_count = channel.view_count;
+      stats.follow_count = channelFollowers.length;
       stats.twitchchannelId = channel.channel_id
       await stats.save();
    }
@@ -263,9 +347,9 @@ export async function refreshClips() {
  */
 export async function refreshGames() {
    logger.debug(`START: Refreshing Games`);
-   const missingGames = await TwitchStream.select('game_id')
-      .leftJoin(TwitchGame, TwitchGame.field('id'), TwitchStream.field('game_id'))
-      .where(TwitchGame.field("id"), null).all();
+   const missingGames = await TwitchStream.select(TwitchStream.field('game_id'))
+      .leftJoin(TwitchGame, TwitchStream.field('game_id'), TwitchGame.field('game_id'))
+      .where(TwitchGame.field('game_id'), 'is' as Operator, null).all();
    const games: TwitchGameData[] = await fetchGames(missingGames.map((s) => s.game_id as string));
    for (const game of games) {
       const currentGame = new TwitchGame();

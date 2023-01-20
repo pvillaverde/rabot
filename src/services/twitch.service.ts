@@ -110,6 +110,7 @@ export async function fetchUsers(channelNames: string[]): Promise<TwitchUserData
 
 export interface TwitchStreamData {
    id: string;
+   type: string;
    user_id: string;
    user_login: string;
    user_name: string;
@@ -119,6 +120,11 @@ export interface TwitchStreamData {
    viewer_count: number;
    started_at: Date;
    ended_at: Date;
+   thumbnail_url: string;
+   language: string;
+   is_mature: boolean;
+   tags: string[];
+   live_messages: string;
 }
 
 /**

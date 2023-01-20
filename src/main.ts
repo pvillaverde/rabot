@@ -4,6 +4,8 @@ import { refreshYoutubeStats } from "./acodega/youtube.ts";
 import startDiscordBot from "./bot/mod.ts";
 import { refreshAgenda } from "./services/agenda.service.ts";
 import log from "./services/logger.service.ts";
+import { refreshClips, refreshFollowers, refreshGames, refreshStreams, refreshTwitch } from "./acodega/twitch.ts";
+import { fetchUsers } from "./services/twitch.service.ts";
 
 async function bootStrapApp() {
    const logger = log.getLogger();
@@ -16,10 +18,17 @@ async function bootStrapApp() {
    `);
    // Refrescado inicial dos datos da web de Obradoiro Dixital Galego
    await startDiscordBot();
-   await refreshData();
-   everyMinute(() => {
+   /* await refreshData(); */
+   /* await refreshFollowers();
+   await refreshClips(); */
+   await refreshTwitch();
+   await refreshStreams();
+   await refreshGames();
+
+   everyMinute(async () => {
       logger.debug("everyMinute cron")
       // Comprobar se hai canles emitindo en twitch
+      await refreshStreams();
 
       // Actualizar as mensaxes de discord coas canles que estén emitindo
 
