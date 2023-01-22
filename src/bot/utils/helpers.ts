@@ -1,5 +1,5 @@
 import { TwitchChannel, TwitchGame, TwitchStream } from "../../acodega/twitch.ts";
-import { sendMessage, editMessage, BigString, EditMessage, CreateMessage, DiscordEmbed, humanizeDuration, moment } from "../../deps.ts";
+import { sendMessage, editMessage, BigString, EditMessage, CreateMessage, DiscordEmbed, humanizeDuration } from "../../deps.ts";
 import { DiscordBot, logger, targetChannels } from "../mod.ts";
 
 /**
@@ -78,6 +78,8 @@ export function createLiveEmbedForStream(stream: TwitchStream, channel: TwitchCh
          liveEmbed.fields?.push({ name: "A que andamos?", value: stream.game_name as string, inline: false })
          break;
    }
+   // Etiquetas
+   liveEmbed.fields?.push({ name: "Etiquetas", value: stream.tags as string, inline: false })
    if (isLive) {
       // Se o stream está en directo
       liveEmbed.color = 0x9146ff;
@@ -97,9 +99,9 @@ export function createLiveEmbedForStream(stream: TwitchStream, channel: TwitchCh
       liveEmbed.fields?.push({ name: "Estado", value: `:white_circle: A emisión xa rematou.`, inline: true })
    }
    // Add uptime
-   const now = moment(stream.ended_at as Date).milliseconds();
-   const startedAt = moment(stream.started_at as Date).milliseconds();
-   const streamDuration = humanizeDuration(now - startedAt, {
+   const now = new Date(stream.ended_at as Date).getTime();
+   const startedAt = new Date(stream.started_at as Date).getTime();
+   const streamDuration = humanizeDuration((now - startedAt), {
       delimiter: ', ',
       largest: 2,
       round: true,

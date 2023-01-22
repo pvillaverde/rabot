@@ -1,4 +1,4 @@
-import { DataTypes, Model, Relationships } from "../deps.ts";
+import { DataTypes, Model, Relationships, moment } from "../deps.ts";
 import { logger, BaseChannelData } from "./mod.ts";
 import { fetchJsonData, splitInChunks } from "../services/utils.service.ts";
 import { fetchChannelFollowers, fetchClips, fetchGames, fetchStreams, fetchUsers, TwitchClipData, TwitchFollowersData, TwitchGameData, TwitchUserData } from "../services/twitch.service.ts";
@@ -23,7 +23,7 @@ export class TwitchChannel extends Model {
       profile_image_url: { type: DataTypes.STRING, allowNull: true },
       offline_image_url: { type: DataTypes.STRING, allowNull: true },
       view_count: { type: DataTypes.INTEGER, allowNull: true },
-      channel_created_at: DataTypes.TIMESTAMP,
+      channel_created_at: DataTypes.DATETIME,
 
       twitter: { type: DataTypes.STRING, allowNull: true },
       mastodon: { type: DataTypes.STRING, allowNull: true },
@@ -60,7 +60,7 @@ export class TwitchChannelFollows extends Model {
       to_id: { type: DataTypes.STRING, allowNull: true },
       to_login: { type: DataTypes.STRING, allowNull: true },
       to_name: { type: DataTypes.STRING, allowNull: true },
-      followed_at: DataTypes.TIMESTAMP,
+      followed_at: DataTypes.DATETIME,
    };
    static channel() {
       return this.hasOne(TwitchChannel);
@@ -80,8 +80,9 @@ export class TwitchStream extends Model {
       game_name: { type: DataTypes.STRING, allowNull: true },
       title: { type: DataTypes.STRING, allowNull: true },
       viewer_count: { type: DataTypes.INTEGER, allowNull: true },
-      started_at: DataTypes.TIMESTAMP,
-      ended_at: DataTypes.TIMESTAMP,
+      started_at: DataTypes.DATETIME,
+      ended_at: DataTypes.DATETIME,
+      thumbnail_url: { type: DataTypes.STRING, allowNull: true },
       language: { type: DataTypes.STRING, allowNull: true },
       tags: { type: DataTypes.STRING, allowNull: true },
       is_mature: { type: DataTypes.BOOLEAN, allowNull: true },
@@ -121,7 +122,7 @@ export class TwitchClip extends Model {
       language: { type: DataTypes.STRING, allowNull: true },
       title: { type: DataTypes.STRING, allowNull: true },
       view_count: { type: DataTypes.INTEGER, allowNull: true },
-      clip_created_at: DataTypes.TIMESTAMP,
+      clip_created_at: DataTypes.DATETIME,
       thumbnail_url: { type: DataTypes.STRING, allowNull: true },
    };
 }
@@ -168,10 +169,10 @@ export async function refreshTwitch() {
             currentChannel.channel_id = channel.id;
             currentChannel.login = channel.login;
             currentChannel.display_name = channel.display_name;
-            currentChannel.channel_created_at = channel.created_at;
+            currentChannel.channel_created_at = moment(channel.created_at).toISOString(); // FIX para que non se vaian sumando as horas.
             await currentChannel.save();
          }
-         // Actualizamos os datos que poden mudar.
+         currentChannel.channel_created_at = moment(channel.created_at).toISOString(); // FIX para que non se vaian sumando as horas.
          currentChannel.login = channel.login;
          currentChannel.display_name = channel.display_name;
          currentChannel.broadcaster_type = channel.type;
@@ -183,7 +184,7 @@ export async function refreshTwitch() {
          currentChannel.mastodon = channelData.mastodon as string;
          currentChannel.disabled = false;
          await currentChannel.update();
-         logger.debug(currentChannel);
+         /* logger.debug(currentChannel); */
       }
       const allChannels = await TwitchChannel.all();
       for (const channel of allChannels) {
@@ -218,12 +219,13 @@ export async function refreshStreams() {
          currentStream.title = stream.title;
          currentStream.game_id = stream.game_id;
          currentStream.viewer_count = stream.viewer_count;
-         currentStream.started_at = stream.started_at;
+         currentStream.started_at = new Date(stream.started_at).toISOString();
          currentStream.ended_at = new Date().toISOString();
          currentStream.language = stream.language;
-         currentStream.tags = stream.tags.join(',');
+         currentStream.tags = stream.tags.join(', ');
          currentStream.is_mature = stream.is_mature;
          currentStream.twitchchannelId = stream.user_id;
+         currentStream.thumbnail_url = stream.thumbnail_url;
          await currentStream.save();
       } else {
          // Actualizar o stream existente
@@ -232,10 +234,12 @@ export async function refreshStreams() {
          currentStream.game_name = stream.game_name;
          currentStream.title = stream.title;
          currentStream.viewer_count = stream.viewer_count;
-         currentStream.ended_at = new Date();
+         currentStream.thumbnail_url = stream.thumbnail_url;
+         currentStream.started_at = new Date(stream.started_at).toISOString(); // FIX para que non se vaian sumando as horas.
+         currentStream.tags = stream.tags.join(', ');
+         currentStream.ended_at = new Date().toISOString();
          await currentStream.update();
       }
-      logger.warning(`--------${currentStream.started_at} - ${currentStream.ended_at}`)
       // Crear rexistro cos espectadores que ten neste momento.
       const streamViews = new TwitchStreamViews();
       streamViews.view_count = currentStream.viewer_count;
@@ -244,22 +248,22 @@ export async function refreshStreams() {
    }
    const activeStreams = await TwitchStream.where('type', "live").all();
    for (const stream of activeStreams) {
-      console.log(stream.started_at, stream.ended_at, stream.createdAt, stream.updatedAt);
-      logger.warning(`${stream.started_at} - ${stream.ended_at}`)
       const channel = await TwitchChannel.find(stream.user_id as string);
       const game = await TwitchGame.find(stream.game_id as string);
       let liveMessages: Values = {}
       try {
          if (!stream.live_messages) throw undefined;
          liveMessages = JSON.parse(stream.live_messages as string);
-         logger.info(`Actualizando o directo da canle ${stream.user_name} =>  ${stream.game_name}: ${stream.title}`)
+         // Se o directo leva máis de 5 minutos offline, dámolo por finalizado.
+         if (new Date(stream.ended_at as Date) <= new Date(Date.now() - 1000 * 60 * 5)) {
+            logger.info(`Directo Finalizado de ${stream.user_name}`)
+            stream.type = "offline";
+         } else {
+            logger.info(`Actualizando o directo da canle ${stream.user_name} =>  ${stream.game_name}: ${stream.title}`)
+         }
       } catch (_error) {
          liveMessages = {};
          logger.info(`A canle ${stream.user_name} comezou a emitir ${stream.game_name}: ${stream.title}`)
-      }
-      if (new Date(stream.ended_at as Date) <= new Date(Date.now() - 1000 * 60 * 60)) {
-         logger.warning(`Directo posiblemente offline: o directo da canle ${stream.user_name} =>  ${stream.game_name}: ${stream.title}`)
-         stream.type = "offline";
       }
       const message = { embeds: [createLiveEmbedForStream(stream, channel, game)] };
       for (const discordChannel of targetChannels.galegotwitch) {
@@ -270,8 +274,9 @@ export async function refreshStreams() {
          }
       }
       stream.live_messages = JSON.stringify(liveMessages);
+      stream.started_at = new Date(stream.started_at as Date).toISOString(); // FIX para que non se vaian sumando as horas.
+      stream.ended_at = new Date(stream.ended_at as Date).toISOString(); // FIX para que non se vaian sumando as horas.
       await stream.update();
-      logger.warning(`${stream.started_at} - ${stream.ended_at}`)
    }
    // Co listado de streams que tiñamos activo, comprobar os que xa non están en directo. Se xan on o están, actualizar o directo coa data de fin e cerrar a notificación de discord.
 }
@@ -336,6 +341,7 @@ export async function refreshClips() {
          currentClip.thumbnail_url = clip.thumbnail_url;
          await currentClip.save();
       }
+      currentClip.created_at = clip.created_at; // FIX para que non se vaian sumando as horas.
       currentClip.view_count = clip.view_count;
       currentClip.update();
    }
