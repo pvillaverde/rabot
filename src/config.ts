@@ -73,7 +73,7 @@ export const Config = {
       twitter: false,
       discord: true,
       discordChannelName: "📡emitindo-twitch-galego",
-      messageTemplate: '🤖📺 {channelName}{mentionUser} está agora en directo emitindo  "{title}" en #GalegoTwitch #TwitchEnGalego. Dálle unha ollada en\n{url}'
+      messageTemplate: '🤖📺 {channelName}{mentionUser} está agora en directo emitindo "{title}" en #GalegoTwitch #TwitchEnGalego. Dálle unha ollada en\n{url}'
    },
    podgalego: {
       mastodon: false,

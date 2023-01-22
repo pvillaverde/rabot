@@ -4,6 +4,7 @@ import { fetchJsonData, splitInChunks } from "../services/utils.service.ts";
 import { fetchChannelFollowers, fetchClips, fetchGames, fetchStreams, fetchUsers, TwitchClipData, TwitchFollowersData, TwitchGameData, TwitchUserData } from "../services/twitch.service.ts";
 import { createLiveEmbedForStream, getidString, updateOrSendMessage } from "../bot/utils/helpers.ts";
 import { targetChannels } from "../bot/mod.ts";
+import { publish } from "../services/publish.service.ts";
 
 interface Values { [key: string]: any }
 type FieldValue = number | string | boolean | Date | null;
@@ -227,6 +228,16 @@ export async function refreshStreams() {
          currentStream.twitchchannelId = stream.user_id;
          currentStream.thumbnail_url = stream.thumbnail_url;
          await currentStream.save();
+         const publishChannel: TwitchChannelData = {
+            type: "galegotwitch",
+            twitch: stream.user_login,
+            title: stream.user_name,
+            lastFeedEntry: {
+               title: `${stream.title} (${stream.game_name})`,
+               link: `https://twitch.tv/${stream.user_login}`,
+            }
+         }
+         publish(publishChannel, true, true, false);
       } else {
          // Actualizar o stream existente
          currentStream.game_id = stream.game_id;

@@ -9,11 +9,11 @@ import { TwitchChannelData } from '../acodega/twitch.ts';
 
 const logger = log.getLogger('publishService');
 
-export function publish(channel: PodcastChannelData | YoutubeChannelData | TwitchChannelData) {
+export function publish(channel: PodcastChannelData | YoutubeChannelData | TwitchChannelData, mastodon = true, twitter = true, discord = true) {
    logger.info(`Publishing update for channel ${channel.title}: ${channel.lastFeedEntry.title}`)
-   publishMastodon(channel);
-   publishTwitter(channel);
-   publishDiscord(channel);
+   if (mastodon) { publishMastodon(channel); }
+   if (twitter) { publishTwitter(channel); }
+   if (discord) { publishDiscord(channel); }
 
 }
 async function publishMastodon(channel: PodcastChannelData | YoutubeChannelData | TwitchChannelData) {

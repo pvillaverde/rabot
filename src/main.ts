@@ -4,8 +4,7 @@ import { refreshYoutubeStats } from "./acodega/youtube.ts";
 import startDiscordBot from "./bot/mod.ts";
 import { refreshAgenda } from "./services/agenda.service.ts";
 import log from "./services/logger.service.ts";
-import { refreshClips, refreshFollowers, refreshGames, refreshStreams, refreshTwitch } from "./acodega/twitch.ts";
-import { fetchUsers } from "./services/twitch.service.ts";
+import { refreshClips, refreshFollowers, refreshGames, refreshStreams } from "./acodega/twitch.ts";
 
 async function bootStrapApp() {
    const logger = log.getLogger();
@@ -18,30 +17,21 @@ async function bootStrapApp() {
    `);
    // Refrescado inicial dos datos da web de Obradoiro Dixital Galego
    await startDiscordBot();
-   /* await refreshData(); */
-   /* await refreshFollowers();
-   await refreshClips(); */
-   await refreshTwitch();
-   await refreshStreams();
+   await refreshData();
    await refreshGames();
 
    everyMinute(async () => {
       logger.debug("everyMinute cron")
-      // Comprobar se hai canles emitindo en twitch
+      // Comprobar se hai canles emitindo en twitch, actualizar mensaxes de discord e enviar das demáis redes.
       await refreshStreams();
-
-      // Actualizar as mensaxes de discord coas canles que estén emitindo
-
-      // Se é o primeiro momento que se detecta a canle en activo, enviar publicación as RRSS
    });
 
    every15Minute(async () => {
       logger.debug("every15Minute cron")
-      // Refrescar os datos de ObradoiroDixitalGalego
+      // Refrescar os datos de ObradoiroDixitalGalego, novos vídeos de YT, podcasts e usuarios de twitch
       await refreshData();
-      // Comprobar se hai novos vídeos en Youtube
-
-      // Comprobar se hai novos capítulos nos podcasts.
+      // Se hai xogos pendentes, refrescar a lista
+      await refreshGames();
    });
 
    hourly(async () => {
@@ -54,8 +44,12 @@ async function bootStrapApp() {
    daily(async () => {
       logger.debug("Daily cron at 1:00")
 
-      //TODO: Obter as estatísticas de GalegoTube unha vez o día.
+      // Obter as estatísticas de GalegoTube unha vez o día.
       await refreshYoutubeStats();
+      // Refrescar os seguidores de Youtube
+      await refreshFollowers();
+      // Refrescar os clips de Twitch
+      await refreshClips();
    })
 
    cron("5 0 0 * * *", () => {
