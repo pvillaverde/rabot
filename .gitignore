@@ -3,3 +3,4 @@ error.log
 .env
 fileloader.ts
 data
+docker-compose.yml

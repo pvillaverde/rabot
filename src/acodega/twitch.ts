@@ -185,7 +185,7 @@ export async function refreshTwitch() {
          currentChannel.mastodon = channelData.mastodon as string;
          currentChannel.disabled = false;
          await currentChannel.update();
-         /* logger.debug(currentChannel); */
+         logger.debug(currentChannel);
       }
       const allChannels = await TwitchChannel.all();
       for (const channel of allChannels) {
@@ -251,6 +251,7 @@ export async function refreshStreams() {
          currentStream.ended_at = new Date().toISOString();
          await currentStream.update();
       }
+      logger.debug(stream);
       // Crear rexistro cos espectadores que ten neste momento.
       const streamViews = new TwitchStreamViews();
       streamViews.view_count = currentStream.viewer_count;
