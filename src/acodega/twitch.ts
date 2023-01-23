@@ -349,11 +349,11 @@ export async function refreshClips() {
          currentClip.language = clip.language;
          currentClip.title = clip.title;
          currentClip.view_count = clip.view_count;
-         currentClip.created_at = clip.created_at;
+         currentClip.clip_created_at = clip.created_at;
          currentClip.thumbnail_url = clip.thumbnail_url;
          await currentClip.save();
       }
-      currentClip.created_at = clip.created_at; // FIX para que non se vaian sumando as horas.
+      currentClip.clip_created_at = clip.created_at; // FIX para que non se vaian sumando as horas.
       currentClip.view_count = clip.view_count;
       currentClip.update();
    }
