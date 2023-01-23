@@ -65,7 +65,13 @@ async function updateCalendar(fields: agendaField[]) {
       })
    }
    calendarMessage.fields?.push({ name: 'Última actualización', value: moment().locale(Config.axenda.locale).format('yyyy-MM-DD HH:mm'), inline: true });
-   const message = { embeds: [calendarMessage] };
+   const content = `Nesta axenda van actualizándose os horarios de Twitch das/dos @Twitcheiras .
+
+   Se alguén con ese rol non sae ainda e quere facelo , pedidelle a un @Admins ou @XuntaDirectiva que vos pase a ligazón, logo poderedes engadirvos vos mesmas/os sen problema 👍 
+   
+   E para quen só quere engadir isto ao seu propio google calendar porque prefire lelo alí, tedes esta ligazón:
+   👉  https://calendar.google.com/calendar/u/0?cid=Z2FsZWdvdHdpdGNoQGdtYWlsLmNvbQ`
+   const message = { content, embeds: [calendarMessage] };
    try {
       await updateOrSendMessage(message as any, Config.axenda.discordChannelId, Config.axenda.discordChannelMessageId);
       logger.info(`Updated agenda Calendar`);
