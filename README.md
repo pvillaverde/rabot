@@ -1,4 +1,5 @@
-# RABOT - ACODG: Rede Autómata de BOTs da A.C. Obradoiro Dixital Galego
+# RABOT - ACODG
+## Rede Autómata de BOTs da A.C. Obradoiro Dixital Galego
 Esta aplicación encárgase de obter a información das canles rexistradas na [Asociación Cultural Obradoiro Dixital Galego](https://obradoirodixitalgalego.gal) e dinfundir o novo contido que xeran estes proxectos en galego pola rede, a través das canlees da asociación (Twitter, Mastodon e Discord).
 
 ## Funcións (feitas e por desenvolver)

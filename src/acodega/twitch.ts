@@ -223,7 +223,7 @@ export async function refreshStreams() {
          currentStream.started_at = new Date(stream.started_at).toISOString();
          currentStream.ended_at = new Date().toISOString();
          currentStream.language = stream.language;
-         currentStream.tags = stream.tags.join(', ');
+         currentStream.tags = stream.tags ? stream.tags.join(', ') : null;
          currentStream.is_mature = stream.is_mature;
          currentStream.twitchchannelId = stream.user_id;
          currentStream.thumbnail_url = stream.thumbnail_url;
@@ -247,7 +247,7 @@ export async function refreshStreams() {
          currentStream.viewer_count = stream.viewer_count;
          currentStream.thumbnail_url = stream.thumbnail_url;
          currentStream.started_at = new Date(stream.started_at).toISOString(); // FIX para que non se vaian sumando as horas.
-         currentStream.tags = stream.tags.join(', ');
+         currentStream.tags = stream.tags ? stream.tags.join(', ') : null;
          currentStream.ended_at = new Date().toISOString();
          await currentStream.update();
       }
