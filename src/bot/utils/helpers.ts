@@ -79,7 +79,9 @@ export function createLiveEmbedForStream(stream: TwitchStream, channel: TwitchCh
          break;
    }
    // Etiquetas
-   liveEmbed.fields?.push({ name: "Etiquetas", value: stream.tags as string, inline: false })
+   if(stream.tags) {
+      liveEmbed.fields?.push({ name: "Etiquetas", value: stream.tags as string, inline: false })
+   }
    if (isLive) {
       // Se o stream está en directo
       liveEmbed.color = 0x9146ff;
