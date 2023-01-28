@@ -176,7 +176,7 @@ export async function refreshTwitch() {
          currentChannel.channel_created_at = moment(channel.created_at).toISOString(); // FIX para que non se vaian sumando as horas.
          currentChannel.login = channel.login;
          currentChannel.display_name = channel.display_name;
-         currentChannel.broadcaster_type = channel.type;
+         currentChannel.broadcaster_type = channel.broadcaster_type;
          currentChannel.description = channel.description;
          currentChannel.profile_image_url = channel.profile_image_url;
          currentChannel.offline_image_url = channel.offline_image_url;
