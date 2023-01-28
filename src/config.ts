@@ -56,8 +56,8 @@ export const Config = {
    axenda: {
       enable: true,
       calendarId: "galegotwitch@gmail.com",
-      discordChannelId: "796338134542974986",
-      discordChannelMessageId: "1064315573732905051",
+      discordChannelId: "777124459400134666",
+      discordChannelMessageId: "983067688555397120",
       locale: 'gl',
       days: 4,
    },
