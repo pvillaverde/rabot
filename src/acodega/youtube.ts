@@ -102,7 +102,7 @@ export async function refreshYoutubeStats() {
    for (const channel of youtubeChannels) {
       try {
          logger.debug(`Getting stats for channel: ${channel.channel_name}`)
-         const youtubeJson = await fetchJsonData(`https://youtube.googleapis.com/youtube/v3/channels?part=statistics&key=${Credentials.google.appKey}&id=${channel.id}`)
+         const youtubeJson = await fetchJsonData(`https://youtube.googleapis.com/youtube/v3/channels?part=statistics&key=${Credentials.google.appKey}&id=${channel.channel_uuid}`)
          if (youtubeJson && youtubeJson.items && youtubeJson.items[0] && youtubeJson.items[0].statistics) {
             const youtubeChannelStats = new YoutubeChannelStats();
             youtubeChannelStats.hiddenSubscriberCount = youtubeJson.items[0].statistics.hiddenSubscriberCount;
