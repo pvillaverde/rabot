@@ -62,15 +62,15 @@ export const Config = {
       days: 4,
    },
    galegotube: {
-      mastodon: false,
-      twitter: false,
+      mastodon: true,
+      twitter: true,
       discord: true,
       discordChannelName: "🟥youtube-galego",
       messageTemplate: '🤖🎬 {channelName}{mentionUser} acaba de publicar o vídeo "{title}" no #GalegoTube #Youtubeiras. Dálle unha ollada en\n{url}'
    },
    galegotwitch: {
-      mastodon: false,
-      twitter: false,
+      mastodon: true,
+      twitter: true,
       discord: true,
       discordChannelName: "📡emitindo-twitch-galego",
       messageTemplate: '🤖📺 {channelName}{mentionUser} está agora en directo emitindo "{title}" en #GalegoTwitch #TwitchEnGalego. Dálle unha ollada en\n{url}'
