@@ -1,4 +1,4 @@
-import { cron, everyMinute, every15Minute, hourly, daily } from "./deps.ts";
+import { cron, everyMinute, every15Minute, hourly } from "./deps.ts";
 import { refreshData } from "./acodega/mod.ts";
 import { refreshYoutubeStats } from "./acodega/youtube.ts";
 import startDiscordBot from "./bot/mod.ts";
@@ -41,8 +41,8 @@ async function bootStrapApp() {
 
    });
 
-   daily(async () => {
-      logger.debug("Daily cron at 1:00")
+   cron("0 2 * * *",async () => {
+      logger.debug("Daily cron at 2:00")
 
       // Obter as estatísticas de GalegoTube unha vez o día.
       await refreshYoutubeStats();
@@ -50,9 +50,10 @@ async function bootStrapApp() {
       await refreshFollowers();
       // Refrescar os clips de Twitch
       await refreshClips();
-   })
+      // Crear unha imaxe diaria cos datos que haxa no calendario.
+   });
 
-   cron("5 0 0 * * *", () => {
+   cron("0 5 * * *", () => {
       logger.debug("Daily cron at 5:00")
       // Crear unha imaxe diaria cos datos que haxa no calendario.
 

@@ -77,8 +77,8 @@ export class TwitchStream extends Model {
       user_id: { type: DataTypes.STRING, allowNull: true },
       user_login: { type: DataTypes.STRING, allowNull: true },
       user_name: { type: DataTypes.STRING, allowNull: true },
-      game_id: { type: DataTypes.STRING, allowNull: true },
-      game_name: { type: DataTypes.STRING, allowNull: true },
+      game_id: { type: DataTypes.STRING, allowNull: false },
+      game_name: { type: DataTypes.STRING, allowNull: false },
       title: { type: DataTypes.STRING, allowNull: true },
       viewer_count: { type: DataTypes.INTEGER, allowNull: true },
       started_at: DataTypes.DATETIME,
@@ -240,9 +240,11 @@ export async function refreshStreams() {
          publish(publishChannel, true, true, false);
       } else {
          // Actualizar o stream existente
-         currentStream.game_id = stream.game_id;
+         if(stream.game_id && stream.game_id.length > 0){
+            currentStream.game_id = stream.game_id;
+            currentStream.game_name = stream.game_name;
+         }
          currentStream.type = stream.type;
-         currentStream.game_name = stream.game_name;
          currentStream.title = stream.title;
          currentStream.viewer_count = stream.viewer_count;
          currentStream.thumbnail_url = stream.thumbnail_url;
@@ -320,7 +322,7 @@ export async function refreshFollowers() {
    for (const chunk of chunks) {
       await TwitchChannelFollows.create(chunk as Values);
    }
-   logger.info(`Refreshed ${followers.length} for ${currentChannels.length} channels`);
+   logger.info(`Refreshed ${followers.length} followers for ${currentChannels.length} twitch channels`);
 }
 /**
  * Refresh clips for all channels from Twitch API.
@@ -357,7 +359,7 @@ export async function refreshClips() {
       currentClip.view_count = clip.view_count;
       currentClip.update();
    }
-   logger.info(`Refreshed ${clips.length} for ${currentChannels.length} channels`);
+   logger.info(`Refreshed ${clips.length} clips for ${currentChannels.length} twitch channels`);
 }
 /**
  * Refresh games for all streams from Twitch API.
