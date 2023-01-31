@@ -1,5 +1,5 @@
 
-import { DataTypes, Model, Relationships } from "../deps.ts";
+import { DataTypes, Model, Relationships, moment } from "../deps.ts";
 import { logger, BaseChannelData } from "./mod.ts";
 import { fetchJsonData, getFeedData } from "../services/utils.service.ts";
 import { publish } from "../services/publish.service.ts";
@@ -78,8 +78,12 @@ export async function refreshYoutube() {
             await currentChannel.save();
          }
          // Se ten último vídeo e é distinto do último que recuperou RABOT, publica nas canles que toque.
-         if (channel.lastFeedEntry && currentChannel.last_video_date && new Date(currentChannel.last_video_date as Date) < new Date(channel.lastFeedEntry.published as string)) {
-            publish(channel);
+         if (channel.lastFeedEntry && currentChannel.last_video_link && currentChannel.last_video_link != channel.lastFeedEntry.link) {
+            // Doble verificación para evitar un spam de que o vídeo é da última hora.
+            const isLessThanHourAgo = moment().diff(channel.lastFeedEntry.published, 'hours') < 1;
+            if (isLessThanHourAgo) {
+               publish(channel);
+            }
          }
          currentChannel.channel_name = channel.title;
          currentChannel.channel_date = feedData?.published || new Date();
