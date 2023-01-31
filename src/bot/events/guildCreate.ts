@@ -29,7 +29,7 @@ events.guildCreate = (bot: Bot, guild: Guild) => {
 async function sendMessageToDiscordOwner(bot: Bot, guild: Guild, content: string) {
    try {
       const userChannel = await getDmChannel(bot, guild.ownerId);
-      sendMessage(bot, userChannel.id, { content })
+      await sendMessage(bot, userChannel.id, { content })
    } catch (error) {
       logger.error(error);
       logger.error(`Houbo un erro ao enviarlle mensaxe o dono do discord ${guild.name}, así que marcho que teño que marchar.`);
