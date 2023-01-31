@@ -1,7 +1,7 @@
 import { events } from "./mod.ts";
 import { Config } from "../../config.ts";
 import { DiscordBot, logger, targetChannels } from "../mod.ts";
-import { Guild, Channel, Bot, sendMessage, getDmChannel, hasChannelPermissions, Member } from "../../deps.ts";
+import { Guild, Channel, Bot, sendMessage, getDmChannel, hasChannelPermissions, Member, leaveGuild } from "../../deps.ts";
 
 events.guildCreate = (bot: Bot, guild: Guild) => {
    logger.info(`Joined new server: ${guild.name}`)
@@ -27,6 +27,12 @@ events.guildCreate = (bot: Bot, guild: Guild) => {
 }
 
 async function sendMessageToDiscordOwner(bot: Bot, guild: Guild, content: string) {
-   const userChannel = await getDmChannel(bot, guild.ownerId);
-   sendMessage(bot, userChannel.id, { content })
+   try {
+      const userChannel = await getDmChannel(bot, guild.ownerId);
+      sendMessage(bot, userChannel.id, { content })
+   } catch (error) {
+      logger.error(error);
+      logger.error(`Houbo un erro ao enviarlle mensaxe o dono do discord ${guild.name}, así que marcho que teño que marchar.`);
+      leaveGuild(bot, guild.id);      
+   }
 }
