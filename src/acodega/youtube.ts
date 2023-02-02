@@ -77,16 +77,15 @@ export async function refreshYoutube() {
             currentChannel.mastodon = channel.mastodon as string;
             await currentChannel.save();
          }
-         if (currentChannel.channel_uuid == "UCZZTH6dVk9k_ah6OpZ-w7ZA") {
-            logger.warning(currentChannel.last_video_link);
-            logger.warning(currentChannel.last_video_title);
-            logger.warning(currentChannel.last_video_date);
-            console.log(channel.lastFeedEntry);
-         }
          // Se ten último vídeo e é distinto do último que recuperou RABOT, publica nas canles que toque.
-         if (channel.lastFeedEntry && currentChannel.last_video_link && currentChannel.last_video_link != channel.lastFeedEntry.link) {
+         if (channel.lastFeedEntry && channel.lastFeedEntry.link && currentChannel.last_video_link && currentChannel.last_video_link != channel.lastFeedEntry.link) {
             // Doble verificación para evitar un spam de que o vídeo é da última hora.
-            logger.warning("Pasei o primeiro check, agora publicaria a canle.")
+            if (currentChannel.channel_uuid == "UCZZTH6dVk9k_ah6OpZ-w7ZA") {
+               logger.warning(currentChannel.last_video_link);
+               logger.warning(currentChannel.last_video_title);
+               logger.warning(currentChannel.last_video_date);
+               console.log(channel.lastFeedEntry);
+            }
             const isLessThanHourAgo = moment().diff(channel.lastFeedEntry.published, 'hours') < 1;
             if (isLessThanHourAgo) {
                publish(channel);
