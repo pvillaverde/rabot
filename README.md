@@ -21,4 +21,9 @@ Esta aplicación encárgase de obter a información das canles rexistradas na [A
 - [X] Os RSS de Podcast non permiten obter máis datos, pero cos de Youtube poderíamos gardar certas estatísticas, ao igual que se fai coas de Twitch. Poderíase facer o que fan os bots de estatísticas dende este.
 - [ ] Creación dunha imaxe co calendario do día ou da semana para publicar nas redes
 - [X] Gardado das estatísticas de Youtube diariamente.
-- [ ]
+- [ ] Gardar nunha táboa da base de datos os servidores de Discord nos que está conectado. Con esta información pódese:
+   - [ ] Configurar unha canle para cada tipo de contido, gardando a ID da canle na fila da base de datos.
+   - [ ] Configurar unha canle para actualizar a axenda, podendo configurarse en distintos discord.
+   - [ ] Comando de Axuda que indique o resto de comandos e que se poda combinar co resto de comandos para depurar problemas de permisos, nomes de canles, instrucións de como engadir no teu servidor, etc..
+   - [ ] Comandos de administración para listar en que servidores está e opcionalmente sacalos deles?
+   - [ ] Comando para configurar unha canle de clips onde se publiquen diariamente os clips. Sería interesante que en función das estrelas que reciban os clips, a partir de X Estrelas vaia a unha canle destacada.
