@@ -240,7 +240,7 @@ export async function refreshStreams() {
          publish(publishChannel, true, true, false);
       } else {
          // Actualizar o stream existente
-         if(stream.game_id && stream.game_id.length > 0){
+         if (stream.game_id && stream.game_id.length > 0) {
             currentStream.game_id = stream.game_id;
             currentStream.game_name = stream.game_name;
          }
@@ -369,7 +369,8 @@ export async function refreshGames() {
    logger.debug(`START: Refreshing Games`);
    const missingGames = await TwitchStream.select(TwitchStream.field('game_id'))
       .leftJoin(TwitchGame, TwitchStream.field('game_id'), TwitchGame.field('game_id'))
-      .where(TwitchGame.field('game_id'), 'is' as Operator, null).all();
+      .where(TwitchGame.field('game_id'), 'is' as Operator, null).where(TwitchStream.field('game_id'), 'is not' as Operator, null).all();
+   logger.debug(missingGames);
    const games: TwitchGameData[] = await fetchGames(missingGames.map((s) => s.game_id as string));
    for (const game of games) {
       const currentGame = new TwitchGame();
