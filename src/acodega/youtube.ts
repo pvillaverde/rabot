@@ -80,14 +80,13 @@ export async function refreshYoutube() {
          // Se ten último vídeo e é distinto do último que recuperou RABOT, publica nas canles que toque.
          if (channel.lastFeedEntry && channel.lastFeedEntry.link && currentChannel.last_video_link && currentChannel.last_video_link != channel.lastFeedEntry.link) {
             // Doble verificación para evitar un spam de que o vídeo é da última hora.
-            if (currentChannel.channel_uuid == "UCZZTH6dVk9k_ah6OpZ-w7ZA") {
-               logger.warning(currentChannel.last_video_link);
-               logger.warning(currentChannel.last_video_title);
-               logger.warning(currentChannel.last_video_date);
-               console.log(channel.lastFeedEntry);
-            }
             const isLessThanHourAgo = moment().diff(channel.lastFeedEntry.published, 'hours') < 1;
-            if (isLessThanHourAgo) {
+            // Triple verificación, comprobar que o vídeo sexa posterior o vídeo anterior.
+            const isAfterLastVideo = moment(channel.lastFeedEntry.published).isAfter(moment(currentChannel.last_video_date as string));
+            if (isLessThanHourAgo && isAfterLastVideo) {
+               currentChannel.last_video_date = channel.lastFeedEntry?.published as string;
+               currentChannel.last_video_title = channel.lastFeedEntry?.title as string;
+               currentChannel.last_video_link = channel.lastFeedEntry?.link as string;
                publish(channel);
             }
          }
@@ -95,9 +94,6 @@ export async function refreshYoutube() {
          currentChannel.channel_date = feedData?.published || new Date();
          currentChannel.twitter = channel.twitter as string;
          currentChannel.mastodon = channel.mastodon as string;
-         currentChannel.last_video_date = channel.lastFeedEntry?.published as string;
-         currentChannel.last_video_title = channel.lastFeedEntry?.title as string;
-         currentChannel.last_video_link = channel.lastFeedEntry?.link as string;
          await currentChannel.update();
          logger.debug(currentChannel);
       }
