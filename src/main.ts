@@ -41,7 +41,7 @@ async function bootStrapApp() {
 
    });
 
-   cron("0 2 * * *",async () => {
+   cron("5 2 * * *",async () => {
       logger.debug("Daily cron at 2:00")
 
       // Obter as estatísticas de GalegoTube unha vez o día.
