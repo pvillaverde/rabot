@@ -5,13 +5,13 @@ await log.setup({
    //define handlers
    handlers: {
       console: new log.handlers.ConsoleHandler(Config.logger.ConsoleLogLevel, {
-         formatter: "{datetime} [{loggerName}-{levelName}] {msg}"
+         formatter: rec => JSON.stringify({ datetime: rec.datetime,region: rec.loggerName, level: rec.levelName, data: rec.msg })
       }),
       file: new log.handlers.RotatingFileHandler('ERROR', {
          filename: './error.log',
          maxBytes: 10485760,
          maxBackupCount: 5,
-         formatter: rec => JSON.stringify({ region: rec.loggerName, ts: rec.datetime, level: rec.levelName, data: rec.msg })
+         formatter: rec => JSON.stringify({ datetime: rec.datetime,region: rec.loggerName, level: rec.levelName, data: rec.msg })
       })
    },
    //assign handlers to loggers  
