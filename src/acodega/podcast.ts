@@ -35,9 +35,10 @@ export async function refreshPodcast() {
    try {
       const updateChannels: PodcastChannelData[] = await fetchJsonData('https://obradoirodixitalgalego.gal/api/podcast.json');
       // Recorre cada canle e obtén o seu último vídeo
-      logger.debug(`START: Refreshing ${updateChannels.length} podcast channels`);
+      logger.info(`START: Refreshing ${updateChannels.length} podcast channels`);
       for (const channel of updateChannels) {
          // Obtemos a información do RSS
+         logger.info(`[TEMP] - ${channel.title} - getFeedData`);
          const feedData = await getFeedData(channel.rss);
          if (feedData && feedData.items && feedData.items.length) {
             channel.type = "podgalego";
@@ -48,6 +49,7 @@ export async function refreshPodcast() {
             }
          }
          // Buscamos se existe xa na BBDD e en caso contrario creámolo.
+         logger.info(`[TEMP] - ${channel.title} - findInDatabase`);
          let currentChannel = await PodcastChannel.find(channel.rss)
          if (!currentChannel) {
             currentChannel = new PodcastChannel();
@@ -58,6 +60,7 @@ export async function refreshPodcast() {
             currentChannel.mastodon = channel.mastodon as string;
             await currentChannel.save();
          }
+         logger.info(`[TEMP] - ${channel.title} - Publish & Update`);
          // Se ten último podcast e é distinto do último que recuperou RABOT, publica nas canles que toque.
          if (channel.lastFeedEntry && currentChannel.last_podcast_date && new Date(currentChannel.last_podcast_date as Date) < new Date(channel.lastFeedEntry.published as string)) {
             publish(channel);
@@ -70,9 +73,13 @@ export async function refreshPodcast() {
          currentChannel.last_podcast_title = channel.lastFeedEntry?.title as string;
          currentChannel.last_podcast_link = channel.lastFeedEntry?.link as string;
          await currentChannel.update();
+         logger.info(`[TEMP] - ${channel.title} - Finished`);
          logger.debug(currentChannel);
       }
       logger.info(`Refreshed ${updateChannels.length} podcast channels with their last podcast`);
-   } catch (error) { logger.error(error); }
+   } catch (error) { 
+      logger.error("Algún erro aconteceu.");
+      logger.error(error); 
+   }
    return true;
 }
