@@ -1,7 +1,7 @@
 
 /** DiscordDeno dependencies */
-export * from "https://deno.land/x/discordeno@17.0.1/mod.ts";
-export * from "https://deno.land/x/discordeno@17.0.1/plugins/mod.ts";
+export * from "https://deno.land/x/discordeno@18.0.1/mod.ts";
+export * from "https://deno.land/x/discordeno@18.0.1/plugins/mod.ts";
 /** DenoDB dependencies */
 export * from "https://deno.land/x/denodb@v1.4.0/mod.ts";
 
