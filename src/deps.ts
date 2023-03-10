@@ -5,9 +5,9 @@ export * from "https://deno.land/x/discordeno@17.0.1/plugins/mod.ts";
 /** DenoDB dependencies */
 export * from "https://deno.land/x/denodb@v1.2.0/mod.ts";
 
-export { readLines } from "https://deno.land/std@0.78.0/io/mod.ts";
+export { readLines } from "https://deno.land/std@0.178.0/io/mod.ts";
 /** logger */
-export * as log from "https://deno.land/std@0.171.0/log/mod.ts";
+export * as log from "https://deno.land/std@0.178.0/log/mod.ts";
 
 /** cron */
 export { cron, everyMinute, every15Minute, hourly, daily, weekly, monthly } from "https://deno.land/x/deno_cron@v1.0.0/cron.ts";
