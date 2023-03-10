@@ -29,7 +29,7 @@ const embeds = [
 
       • Nas canles de <#796436639936544768> , <#776164735217172561> e <#802363333092966400> podes recibir avisos cando algunha canle da comunidade está en directo ou sube un novo vídeo ou podcast.
 
-      • Na <#920367888349679677> tamén podes consultar os vindeiros directos que están programados. Se queres que tamén figuren aquí os teus, fainos chegar a consulta a través de <#1066824437439135805>.
+      • Na <#777124459400134666> tamén podes consultar os vindeiros directos que están programados. Se queres que tamén figuren aquí os teus, fainos chegar a consulta a través de <#1066824437439135805>.
 
       • Formas parte da asociación? Podes solicitar acceso as canles internas a través do fío fixado na canle de <#1066824437439135805> 
 

@@ -1,5 +1,5 @@
 import { TwitchChannel, TwitchGame, TwitchStream } from "../../acodega/twitch.ts";
-import { sendMessage, editMessage, BigString, EditMessage, CreateMessage, DiscordEmbed, humanizeDuration } from "../../deps.ts";
+import { sendMessage, editMessage, BigString, EditMessage, CreateMessage, DiscordEmbed, humanizeDuration, crosspostMessage, ChannelTypes, Channel, Message } from "../../deps.ts";
 import { DiscordBot, logger, targetChannels } from "../mod.ts";
 
 /**
@@ -12,6 +12,18 @@ export function getidString(id: BigInt) {
 }
 
 /**
+ * crosspostAnnouncementChannel - sends a message from Discord Annoucement Channels to other Discords that follow that cannel
+ * @param {Channel} channel - the discord channel to check if it's an annoucement channel and publish crossposts
+ * @param {Message} message - the discord message that has just been sent.
+ * @returns {Promise}
+*/
+export async function crosspostAnnouncementChannel(channel: Channel, message: Message) {
+   if (channel.type == ChannelTypes.GuildAnnouncement) {
+      await crosspostMessage(DiscordBot, channel.id, message.id);
+   }
+   return;
+}
+/**
  * sendMessageToDiscordChannels - sends a message to the Discord channels associated with the specified platform
  * @param {string} platform - the platform to send the message to (options: "galegotube", "galegotwitch", "podgalego")
  * @param {string} content - the message to send
@@ -19,7 +31,8 @@ export function getidString(id: BigInt) {
 */
 export async function sendMessageToDiscordChannels(platform: "galegotube" | "galegotwitch" | "podgalego", content: string) {
    for (const channel of targetChannels[platform]) {
-      await sendMessage(DiscordBot, channel.id, { content });
+      const message = await sendMessage(DiscordBot, channel.id, { content });
+      crosspostAnnouncementChannel(channel, message);
    }
    return;
 }
@@ -79,7 +92,7 @@ export function createLiveEmbedForStream(stream: TwitchStream, channel: TwitchCh
          break;
    }
    // Etiquetas
-   if(stream.tags) {
+   if (stream.tags) {
       liveEmbed.fields?.push({ name: "Etiquetas", value: stream.tags as string, inline: false })
    }
    if (isLive) {

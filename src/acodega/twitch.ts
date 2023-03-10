@@ -2,7 +2,7 @@ import { DataTypes, Model, Relationships, moment } from "../deps.ts";
 import { logger, BaseChannelData } from "./mod.ts";
 import { fetchJsonData, splitInChunks } from "../services/utils.service.ts";
 import { fetchChannelFollowers, fetchClips, fetchGames, fetchStreams, fetchUsers, TwitchClipData, TwitchFollowersData, TwitchGameData, TwitchUserData } from "../services/twitch.service.ts";
-import { createLiveEmbedForStream, getidString, updateOrSendMessage } from "../bot/utils/helpers.ts";
+import { createLiveEmbedForStream, getidString, updateOrSendMessage, crosspostAnnouncementChannel } from "../bot/utils/helpers.ts";
 import { targetChannels } from "../bot/mod.ts";
 import { publish } from "../services/publish.service.ts";
 
@@ -285,6 +285,7 @@ export async function refreshStreams() {
          const discordMessage = await updateOrSendMessage(message as any, channelId, liveMessages[channelId]);
          if (discordMessage) {
             liveMessages[channelId] = getidString(discordMessage.id);
+            crosspostAnnouncementChannel(discordChannel, discordMessage);
          }
       }
       stream.live_messages = JSON.stringify(liveMessages);
