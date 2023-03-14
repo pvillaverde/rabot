@@ -29,9 +29,16 @@ db.link([YoutubeChannel, YoutubeChannelStats, PodcastChannel, TwitchChannel, Twi
 /** Refresca os datos de todas as plataformas. */
 export async function refreshData() {
    logger.debug(`Refreshing all data from Podcasts, Youtube and Twitch`);
-   return await Promise.all([
-      refreshPodcast(),
-      refreshYoutube(),
-      refreshTwitch()
-   ]);
+   return await Promise.race([
+      Promise.all([
+         refreshPodcast(),
+         refreshYoutube(),
+         refreshTwitch()
+      ]),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 1000 * 60 * 10))
+   ]).catch(error => {
+      logger.error("Algún erro aconteceu ao refescar os logs e pasou o tempo de espera.");
+      logger.error(error);
+   });
 }
+
