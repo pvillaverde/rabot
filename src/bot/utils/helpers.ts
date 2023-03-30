@@ -19,7 +19,12 @@ export function getidString(id: BigInt) {
 */
 export async function crosspostAnnouncementChannel(channel: Channel, message: Message) {
    if (channel.type == ChannelTypes.GuildAnnouncement) {
-      await crosspostMessage(DiscordBot, channel.id, message.id);
+      try {
+         await crosspostMessage(DiscordBot, channel.id, message.id);
+      } catch (error) {
+         logger.error(`Couldn't crosspost message ${message.id}.`)
+         logger.error(error);
+      }
    }
    return;
 }
