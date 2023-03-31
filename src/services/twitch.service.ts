@@ -66,8 +66,8 @@ async function getAccessToken() {
       Deno.env.set("RABOT_TWITCH_TOKEN", JSON.stringify(response.data));
       return response.data;
    } catch (error) {
-      logger.error(`Error while refreshing access token`);
-      logger.error(error);
+      logger.critical(`Error while refreshing access token`);
+      logger.critical(error);
       throw error;
    }
 }

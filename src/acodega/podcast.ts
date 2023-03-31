@@ -74,8 +74,8 @@ export async function refreshPodcast() {
       }
       logger.info(`Refreshed ${updateChannels.length} podcast channels with their last podcast`);
    } catch (error) { 
-      logger.error("Algún erro aconteceu.");
-      logger.error(error); 
+      logger.critical("Algún erro aconteceu.");
+      logger.critical(error); 
    }
    return true;
 }

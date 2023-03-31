@@ -26,8 +26,8 @@ events.guildCreate = async (bot: Bot, guild: Guild) => {
          }
       }
    } catch (error) {
-      logger.error(error);
-      logger.error(`Houbo un erro ao enviarlle mensaxe o dono do discord ${guild.name}, así que marcho que teño que marchar.`);
+      logger.critical(error);
+      logger.critical(`Houbo un erro ao enviarlle mensaxe o dono do discord ${guild.name}, así que marcho que teño que marchar.`);
       leaveGuild(bot, guild.id);     
    }
 }

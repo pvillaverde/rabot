@@ -120,8 +120,8 @@ export async function refreshYoutubeStats() {
             logger.debug(youtubeChannelStats)
          }
       } catch (error) {
-         logger.error(`Erro ao actualizar as estatísticas de Youtube`);
-         logger.error(error);
+         logger.critical(`Erro ao actualizar as estatísticas de Youtube`);
+         logger.critical(error);
       }
    }
    logger.info(`Gardadas as estatísticas de ${youtubeChannels.length} canles de YouTube.`)
