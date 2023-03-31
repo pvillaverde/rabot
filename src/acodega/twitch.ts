@@ -280,7 +280,6 @@ export async function refreshStreams() {
          logger.info(`A canle ${stream.user_name} comezou a emitir ${stream.game_name}: ${stream.title}`)
       }
       const message = { embeds: [createLiveEmbedForStream(stream, channel, game)] };
-      console.log("TEMP", targetChannels.galegotwitch);
       for (const discordChannel of targetChannels.galegotwitch) {
          const channelId = getidString(discordChannel.id);
          const discordMessage = await updateOrSendMessage(message as any, channelId, liveMessages[channelId]);
