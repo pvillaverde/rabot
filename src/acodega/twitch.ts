@@ -285,9 +285,12 @@ export async function refreshStreams() {
          const channelId = getidString(discordChannel.id);
          logger.info(`TEMP: sending message to ${discordChannel.name}`);
          const discordMessage = await updateOrSendMessage(message as any, channelId, liveMessages[channelId]);
+         logger.info(`TEMP: message sent`);
          if (discordMessage) {
             liveMessages[channelId] = getidString(discordMessage.id);
+            logger.info(`TEMP: checking crosspost`);
             await crosspostAnnouncementChannel(discordChannel, discordMessage);
+            logger.info(`TEMP: crossposted`);
          }
       }
       logger.info(`TEMP: saving stream.`);
@@ -295,6 +298,7 @@ export async function refreshStreams() {
       stream.started_at = new Date(stream.started_at as Date).toISOString(); // FIX para que non se vaian sumando as horas.
       stream.ended_at = new Date(stream.ended_at as Date).toISOString(); // FIX para que non se vaian sumando as horas.
       await stream.update();
+      logger.info(`TEMP: saved`);
    }
    // Co listado de streams que tiñamos activo, comprobar os que xa non están en directo. Se xan on o están, actualizar o directo coa data de fin e cerrar a notificación de discord.
 }
