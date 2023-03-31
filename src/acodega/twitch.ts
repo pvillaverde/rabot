@@ -285,7 +285,7 @@ export async function refreshStreams() {
          const discordMessage = await updateOrSendMessage(message as any, channelId, liveMessages[channelId]);
          if (discordMessage) {
             liveMessages[channelId] = getidString(discordMessage.id);
-            await crosspostAnnouncementChannel(discordChannel, discordMessage);
+            /* await crosspostAnnouncementChannel(discordChannel, discordMessage); */
          }
       }
       stream.live_messages = JSON.stringify(liveMessages);
