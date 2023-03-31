@@ -18,6 +18,7 @@ export function getidString(id: BigInt) {
  * @returns {Promise}
 */
 export async function crosspostAnnouncementChannel(channel: Channel, message: Message) {
+   if (message.editedTimestamp) return; // Do not crosspost edited messages.
    if (channel.type == ChannelTypes.GuildAnnouncement) {
       try {
          await crosspostMessage(DiscordBot, channel.id, message.id);
