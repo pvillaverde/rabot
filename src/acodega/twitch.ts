@@ -280,22 +280,15 @@ export async function refreshStreams() {
          logger.info(`A canle ${stream.user_name} comezou a emitir ${stream.game_name}: ${stream.title}`)
       }
       const message = { embeds: [createLiveEmbedForStream(stream, channel, game)] };
-      logger.info(`TEMP: embed message created`);
-      logger.info(`how many target channels? ${targetChannels.galegotwitch}`);
-      console.log(targetChannels.galegotwitch);
+      console.log("TEMP", targetChannels.galegotwitch);
       for (const discordChannel of targetChannels.galegotwitch) {
          const channelId = getidString(discordChannel.id);
-         logger.info(`TEMP: sending message to ${discordChannel.name}`);
          const discordMessage = await updateOrSendMessage(message as any, channelId, liveMessages[channelId]);
-         logger.info(`TEMP: message sent`);
          if (discordMessage) {
             liveMessages[channelId] = getidString(discordMessage.id);
-            logger.info(`TEMP: checking crosspost`);
             await crosspostAnnouncementChannel(discordChannel, discordMessage);
-            logger.info(`TEMP: crossposted`);
          }
       }
-      logger.info(`TEMP: saving stream.`);
       stream.live_messages = JSON.stringify(liveMessages);
       stream.started_at = new Date(stream.started_at as Date).toISOString(); // FIX para que non se vaian sumando as horas.
       stream.ended_at = new Date(stream.ended_at as Date).toISOString(); // FIX para que non se vaian sumando as horas.

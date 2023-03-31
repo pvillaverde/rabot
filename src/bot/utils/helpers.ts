@@ -18,8 +18,6 @@ export function getidString(id: BigInt) {
  * @returns {Promise}
 */
 export async function crosspostAnnouncementChannel(channel: Channel, message: Message) {
-
-   logger.info(`TEMP: Crossposting... message EditedTimestamp? ${message.editedTimestamp}.`);
    if (message.editedTimestamp) return; // Do not crosspost edited messages.
    if (channel.type == ChannelTypes.GuildAnnouncement) {
       try {
