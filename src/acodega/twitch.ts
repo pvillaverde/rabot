@@ -281,6 +281,8 @@ export async function refreshStreams() {
       }
       const message = { embeds: [createLiveEmbedForStream(stream, channel, game)] };
       logger.info(`TEMP: embed message created`);
+      logger.info(`how many target channels? ${targetChannels.galegotwitch}`);
+      console.log(targetChannels.galegotwitch);
       for (const discordChannel of targetChannels.galegotwitch) {
          const channelId = getidString(discordChannel.id);
          logger.info(`TEMP: sending message to ${discordChannel.name}`);
