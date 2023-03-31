@@ -12,9 +12,7 @@ events.guildCreate = async (bot: Bot, guild: Guild) => {
          const channelName = Config[platform].discordChannelName;
          const targetChannel = guild.channels.find((c: Channel) => c.name === channelName);
          if (!targetChannel) {
-            logger.warning(`Configuration problem! Guild ${guild.name} does not have a #${channelName} channel!`)
-
-            leaveGuild(bot, guild.id);     
+            logger.warning(`Configuration problem! Guild ${guild.name} does not have a #${channelName} channel!`)  
             /* await sendMessageToDiscordOwner(bot, guild, `Ocurriu un erro ao configurar o bot, non atopo a canle \`${channelName}\` no servidor \`${guild.name}\`, engádea para recibir as notificacións de ${platform}.`); */
          } else {
             const member = DiscordBot.members.get(DiscordBot.transformers.snowflake(`${bot.id}${guild.id}`))
