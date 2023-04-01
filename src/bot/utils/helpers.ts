@@ -38,7 +38,7 @@ export async function crosspostAnnouncementChannel(channel: Channel, message: Me
 export async function sendMessageToDiscordChannels(platform: "galegotube" | "galegotwitch" | "podgalego", content: string) {
    for (const channel of targetChannels[platform]) {
       const message = await sendMessage(DiscordBot, channel.id, { content });
-      crosspostAnnouncementChannel(channel, message);
+      /* crosspostAnnouncementChannel(channel, message); */
    }
    return;
 }
@@ -52,7 +52,6 @@ export async function sendMessageToDiscordChannels(platform: "galegotube" | "gal
 export async function updateOrSendMessage(message: CreateMessage | EditMessage, channelId: BigString, messageId?: BigString) {
    if (messageId) {
       try {
-         console.log("editMessage", message,channelId,messageId);
          return await editMessage(DiscordBot, channelId, messageId, message as EditMessage);
       } catch (error) {
          logger.error(`Couldn't edit message ${messageId}.`)
@@ -60,7 +59,6 @@ export async function updateOrSendMessage(message: CreateMessage | EditMessage, 
       }
    } else {
       try {
-         console.log("sendMessage", message,channelId);
          return await sendMessage(DiscordBot, channelId, message as CreateMessage);
       } catch (error) {
          logger.error(`Couldn't send message ${messageId}.`)
