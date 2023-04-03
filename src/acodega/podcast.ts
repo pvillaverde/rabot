@@ -35,7 +35,7 @@ export async function refreshPodcast() {
    try {
       const updateChannels: PodcastChannelData[] = await fetchJsonData('https://obradoirodixitalgalego.gal/api/podcast.json');
       // Recorre cada canle e obtén o seu último vídeo
-      logger.info(`START: Refreshing ${updateChannels.length} podcast channels`);
+      logger.debug(`START: Refreshing ${updateChannels.length} podcast channels`);
       for (const channel of updateChannels) {
          // Obtemos a información do RSS
          const feedData = await getFeedData(channel.rss);
