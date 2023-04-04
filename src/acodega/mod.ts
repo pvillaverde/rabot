@@ -20,6 +20,11 @@ const connector = Credentials.postgresql ? new PostgresConnector(Credentials.pos
 
 const db = new Database({ connector, debug: false });
 
+function reconnectDatabase() {
+   logger.warning('Trying to reconnect Database')
+   connector._connected = false;
+   return connector._makeConnection();
+}
 
 db.link([YoutubeChannel, YoutubeChannelStats, PodcastChannel, TwitchChannel, TwitchChannelStats, TwitchChannelFollows, TwitchStream, TwitchStreamViews, TwitchClip, TwitchGame]);
 
@@ -39,6 +44,7 @@ export async function refreshData() {
    ]).catch(error => {
       logger.critical("Algún erro aconteceu ao refescar os logs e pasou o tempo de espera.");
       logger.critical(error);
+      reconnectDatabase();
    });
 }
 
