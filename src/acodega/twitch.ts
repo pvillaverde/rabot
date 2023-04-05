@@ -162,30 +162,35 @@ export async function refreshTwitch() {
       const channelNames = updateChannels.map(c => c.twitch);
       const twitchChannels: TwitchUserData[] = await fetchUsers(channelNames);
       for (const channel of twitchChannels) {
-         // Buscamos se existe xa na BBDD e en caso contrario creámolo.
-         const channelData = updateChannels.find(c => c.twitch.toLowerCase() === channel.login) as TwitchChannelData;
-         let currentChannel = await TwitchChannel.find(channel.id)
-         if (!currentChannel) {
-            currentChannel = new TwitchChannel();
-            currentChannel.channel_id = channel.id;
+         try {
+            // Buscamos se existe xa na BBDD e en caso contrario creámolo.
+            const channelData = updateChannels.find(c => c.twitch.toLowerCase() === channel.login) as TwitchChannelData;
+            let currentChannel = await TwitchChannel.find(channel.id)
+            if (!currentChannel) {
+               currentChannel = new TwitchChannel();
+               currentChannel.channel_id = channel.id;
+               currentChannel.login = channel.login;
+               currentChannel.display_name = channel.display_name;
+               currentChannel.channel_created_at = moment(channel.created_at).toISOString(); // FIX para que non se vaian sumando as horas.
+               await currentChannel.save();
+            }
+            currentChannel.channel_created_at = moment(channel.created_at).toISOString(); // FIX para que non se vaian sumando as horas.
             currentChannel.login = channel.login;
             currentChannel.display_name = channel.display_name;
-            currentChannel.channel_created_at = moment(channel.created_at).toISOString(); // FIX para que non se vaian sumando as horas.
-            await currentChannel.save();
+            currentChannel.broadcaster_type = channel.broadcaster_type;
+            currentChannel.description = channel.description;
+            currentChannel.profile_image_url = channel.profile_image_url;
+            currentChannel.offline_image_url = channel.offline_image_url;
+            currentChannel.view_count = channel.view_count;
+            currentChannel.twitter = channelData.twitter as string;
+            currentChannel.mastodon = channelData.mastodon as string;
+            currentChannel.disabled = false;
+            await currentChannel.update();
+            logger.debug(currentChannel);
+         } catch (error) {
+            logger.critical(`Erro ao actualizar a canle de Twitch ${channel.login}`);
+            logger.critical(error);
          }
-         currentChannel.channel_created_at = moment(channel.created_at).toISOString(); // FIX para que non se vaian sumando as horas.
-         currentChannel.login = channel.login;
-         currentChannel.display_name = channel.display_name;
-         currentChannel.broadcaster_type = channel.broadcaster_type;
-         currentChannel.description = channel.description;
-         currentChannel.profile_image_url = channel.profile_image_url;
-         currentChannel.offline_image_url = channel.offline_image_url;
-         currentChannel.view_count = channel.view_count;
-         currentChannel.twitter = channelData.twitter as string;
-         currentChannel.mastodon = channelData.mastodon as string;
-         currentChannel.disabled = false;
-         await currentChannel.update();
-         logger.debug(currentChannel);
       }
       const allChannels = await TwitchChannel.all();
       for (const channel of allChannels) {

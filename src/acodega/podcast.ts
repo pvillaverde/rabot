@@ -32,11 +32,11 @@ export interface PodcastChannelData extends BaseChannelData {
 
 /** Refresca os datos de youtube e comproba o último vídeo da canle. */
 export async function refreshPodcast() {
-   try {
-      const updateChannels: PodcastChannelData[] = await fetchJsonData('https://obradoirodixitalgalego.gal/api/podcast.json');
-      // Recorre cada canle e obtén o seu último vídeo
-      logger.debug(`START: Refreshing ${updateChannels.length} podcast channels`);
-      for (const channel of updateChannels) {
+   const updateChannels: PodcastChannelData[] = await fetchJsonData('https://obradoirodixitalgalego.gal/api/podcast.json');
+   // Recorre cada canle e obtén o seu último vídeo
+   logger.debug(`START: Refreshing ${updateChannels.length} podcast channels`);
+   for (const channel of updateChannels) {
+      try {
          // Obtemos a información do RSS
          const feedData = await getFeedData(channel.rss);
          if (feedData && feedData.items && feedData.items.length) {
@@ -71,11 +71,11 @@ export async function refreshPodcast() {
          currentChannel.last_podcast_link = channel.lastFeedEntry?.link as string;
          await currentChannel.update();
          logger.debug(currentChannel);
+      } catch (error) {
+         logger.critical(`Erro ao actualizar o podcast ${channel.title}`);
+         logger.critical(error);
       }
-      logger.info(`Refreshed ${updateChannels.length} podcast channels with their last podcast`);
-   } catch (error) { 
-      logger.critical("Algún erro aconteceu.");
-      logger.critical(error); 
    }
+   logger.info(`Refreshed ${updateChannels.length} podcast channels with their last podcast`);
    return true;
 }

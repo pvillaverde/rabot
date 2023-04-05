@@ -51,11 +51,11 @@ export interface YoutubeChannelData extends BaseChannelData {
 
 /** Refresca os datos de youtube e comproba o último vídeo da canle. */
 export async function refreshYoutube() {
-   try {
-      const updateChannels: YoutubeChannelData[] = await fetchJsonData('https://obradoirodixitalgalego.gal/api/youtube.json');
-      // Recorre cada canle e obtén o seu último vídeo
-      logger.debug(`START: Refreshing ${updateChannels.length} youtube channels`);
-      for (const channel of updateChannels) {
+   const updateChannels: YoutubeChannelData[] = await fetchJsonData('https://obradoirodixitalgalego.gal/api/youtube.json');
+   // Recorre cada canle e obtén o seu último vídeo
+   logger.debug(`START: Refreshing ${updateChannels.length} youtube channels`);
+   for (const channel of updateChannels) {
+      try {
          // Obtemos a información do RSS
          const feedData = await getFeedData(`https://www.youtube.com/feeds/videos.xml?channel_id=${channel.youtube}`);
          if (feedData && feedData.items && feedData.items.length) {
@@ -96,9 +96,12 @@ export async function refreshYoutube() {
          currentChannel.mastodon = channel.mastodon as string;
          await currentChannel.update();
          logger.debug(currentChannel);
+      } catch (error) {
+         logger.critical(`Erro ao actualizar a canle de Youtube ${channel.title}`);
+         logger.critical(error);
       }
-      logger.info(`Refreshed ${updateChannels.length} youtube channels with their last video`);
-   } catch (error) { logger.error(error); }
+   }
+   logger.info(`Refreshed ${updateChannels.length} youtube channels with their last video`);
    return true;
 }
 
