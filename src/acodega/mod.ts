@@ -21,9 +21,9 @@ const connector = Credentials.postgresql ? new PostgresConnector(Credentials.pos
 const db = new Database({ connector, debug: false });
 
 function reconnectDatabase() {
-   logger.warning('Trying to reconnect Database')
-   connector._connected = false;
-   return connector._makeConnection();
+   logger.warning('Closing and reconnecting database')
+   db.close();
+   db.link([YoutubeChannel, YoutubeChannelStats, PodcastChannel, TwitchChannel, TwitchChannelStats, TwitchChannelFollows, TwitchStream, TwitchStreamViews, TwitchClip, TwitchGame]);
 }
 
 db.link([YoutubeChannel, YoutubeChannelStats, PodcastChannel, TwitchChannel, TwitchChannelStats, TwitchChannelFollows, TwitchStream, TwitchStreamViews, TwitchClip, TwitchGame]);
