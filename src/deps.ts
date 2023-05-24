@@ -19,7 +19,7 @@ export { TwitterApi } from 'npm:twitter-api-v2';
 
 export { Axios } from "npm:axios";
 
-import rssParser from "npm:rss-parser";
+import rssParser from "npm:rss-parser@3.12.0";
 import moment from "npm:moment-timezone";
 moment.tz.setDefault("Europe/Madrid");
 import humanizeDuration from "npm:humanize-duration";

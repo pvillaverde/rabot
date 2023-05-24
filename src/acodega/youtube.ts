@@ -78,7 +78,7 @@ export async function refreshYoutube() {
             await currentChannel.save();
          }
          // Se ten último vídeo e é distinto do último que recuperou RABOT, publica nas canles que toque.
-         if (channel.lastFeedEntry && channel.lastFeedEntry.link && (!currentChannel.last_video_link || (currentChannel.last_video_link != channel.lastFeedEntry.link))) {
+         if (channel.lastFeedEntry && channel.lastFeedEntry.link && currentChannel.last_video_link != channel.lastFeedEntry.link) {
             // Doble verificación para evitar un spam de que o vídeo é da última hora.
             const isLessThanHourAgo = moment().diff(channel.lastFeedEntry.published, 'hours') < 1;
             // Triple verificación, comprobar que o vídeo sexa posterior o vídeo anterior.
