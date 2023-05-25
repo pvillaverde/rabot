@@ -1,29 +1,16 @@
-import { Axios } from "../deps.ts";
 import { Credentials } from "../config.ts";
 import log from "./logger.service.ts";
 import { splitInChunks } from "./utils.service.ts";
 
 const logger = log.getLogger('twitchService');
-const axios = new Axios({
-   baseURL: "https://api.twitch.tv/helix/",
-   // return JSONs
-   transformResponse: (data, _headers) => JSON.parse(data),
-   headers: {
-      'Client-ID': Credentials.twitch.client_id,
-   },
-});
-// throw errors
-axios.interceptors.response.use(response => {
-   if (response.status >= 400) throw response.data;
-   return response;
-});
 /* JSON.parse(Deno.env.get("RABOT_GOOGLE_CREDENTIALS") as string), */
 
 /**
  * Get the default request options for making API calls to Twitch.
  * @returns {Object} - An object containing the base URL and headers for the request.
  */
-function getRequestOptions() {
+async function fetchTwitchEndpoint(url: string) {
+   const baseURL = "https://api.twitch.tv/helix";
    // Automatically remove "oauth:" prefix if it's present
    const oauthPrefix = 'oauth:';
    let oauthBearer;
@@ -32,11 +19,17 @@ function getRequestOptions() {
       oauthBearer = oauthBearer.substr(oauthPrefix.length);
    }
    // Construct default request options
-   return {
+   const response = await fetch(baseURL + url, {
+      method: "GET",
       headers: {
-         Authorization: `Bearer ${oauthBearer}`,
+         'Client-ID': Credentials.twitch.client_id,
+         "Authorization": `Bearer ${oauthBearer}`,
       },
-   };
+   });
+   const data = await response.json();
+   // throw errors if not authenticated
+   if (data.status >= 400) { throw data; }
+   return data;
 }
 
 /**
@@ -62,9 +55,17 @@ async function getAccessToken() {
    logger.warning("Refreshing twitch access token")
    try {
       const url = `https://id.twitch.tv/oauth2/token?client_id=${Credentials.twitch.client_id}&client_secret=${Credentials.twitch.client_secret}&grant_type=client_credentials`;
-      const response = await axios.post(url);
-      Deno.env.set("RABOT_TWITCH_TOKEN", JSON.stringify(response.data));
-      return response.data;
+      const response = await fetch(url, {
+         method: "POST",
+         headers: {
+            'Client-ID': Credentials.twitch.client_id,
+         },
+      });
+      const data = await response.json();
+      console.log(data);
+
+      Deno.env.set("RABOT_TWITCH_TOKEN", JSON.stringify(data));
+      return data;
    } catch (error) {
       logger.critical(`Error while refreshing access token`);
       logger.critical(error);
@@ -97,8 +98,8 @@ export async function fetchUsers(channelNames: string[]): Promise<TwitchUserData
    try {
       let users: TwitchUserData[] = [];
       for (const cNames of channelsInChunks) {
-         const response = await axios.get(`/users?login=${cNames.join('&login=')}`, getRequestOptions());
-         users = users.concat(response.data.data || []);
+         const data = await fetchTwitchEndpoint(`/users?login=${cNames.join('&login=')}`);
+         users = users.concat(data.data || []);
       }
       return users;
    } catch (error) {
@@ -138,10 +139,10 @@ export async function fetchStreams(channelNames: string[]): Promise<TwitchStream
    const channelsInChunks = splitInChunks(channelNames, maxPerRequest);
    try {
       const requests = channelsInChunks.map((cNames: string[]) =>
-         axios.get(`/streams?user_login=${cNames.join('&user_login=')}`, getRequestOptions()));
+         fetchTwitchEndpoint(`/streams?user_login=${cNames.join('&user_login=')}`));
       const responses = await Promise.all(requests);
       // get the data array from each response
-      const responsesStreamsData: TwitchStreamData[][] = responses.map(response => response.data.data || []);
+      const responsesStreamsData: TwitchStreamData[][] = responses.map(response => response.data || []);
       // flatten the array of arrays into a single array
       const streams = responsesStreamsData.reduce((array, data) => array.concat(data), []);
       return streams;
@@ -165,8 +166,8 @@ export interface TwitchGameData {
  */
 export async function fetchGames(gameIds: string[]): Promise<TwitchGameData[]> {
    try {
-      const response = await axios.get(`/games?id=${gameIds.join('&id=')}`, getRequestOptions())
-      return response.data.data || [];
+      const response = await fetchTwitchEndpoint(`/games?id=${gameIds.join('&id=')}`)
+      return response.data || [];
    } catch (error) {
       return handleErrorStatus(error)
          .then(() => fetchGames(gameIds))
@@ -198,9 +199,9 @@ export async function fetchChannelFollowers(channelId: string, cursor?: string, 
    // Set pagination cursor
    const pagination = cursor ? `&after=${cursor}` : '';
    try {
-      const response = await axios.get(`/users/follows?to_id=${channelId}&first=100${pagination}`, getRequestOptions())
+      const response = await fetchTwitchEndpoint(`/users/follows?to_id=${channelId}&first=100${pagination}`)
       // If there is a cursor in the response, send another fetch and concat results
-      const responseFollowers = response.data.data || [];
+      const responseFollowers = response.data || [];
       if (response.data.pagination.cursor) {
          return await fetchChannelFollowers(channelId, response.data.pagination.cursor, responseFollowers.concat(previousQueryFollowers));
       } else {
@@ -239,9 +240,9 @@ export async function fetchClips(broadcasterId: string, cursor?: string, previou
    // Set pagination cursor
    const pagination = cursor ? `&after=${cursor}` : '';
    try {
-      const response = await axios.get(`/clips?broadcaster_id=${broadcasterId}&first=100${pagination}`, getRequestOptions())
+      const response = await fetchTwitchEndpoint(`/clips?broadcaster_id=${broadcasterId}&first=100${pagination}`)
       // If there is a cursor in the response, send another fetch and concat results
-      const responseClips = response.data.data || [];
+      const responseClips = response.data || [];
       if (response.data.pagination.cursor) {
          return await fetchClips(broadcasterId, response.data.pagination.cursor, responseClips.concat(previousQueryClips));
       } else {

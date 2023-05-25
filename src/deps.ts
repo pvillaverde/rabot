@@ -6,6 +6,7 @@ export * from "https://deno.land/x/discordeno@18.0.1/plugins/mod.ts";
 export * from "https://deno.land/x/denodb@v1.4.0/mod.ts";
 
 export { readLines } from "https://deno.land/std@0.178.0/io/mod.ts";
+export { parse } from "https://deno.land/x/xml@2.1.1/mod.ts";
 /** logger */
 export * as log from "https://deno.land/std@0.178.0/log/mod.ts";
 
@@ -17,13 +18,10 @@ export { cron, everyMinute, every15Minute, hourly, daily, weekly, monthly } from
 export { login } from 'npm:masto';
 export { TwitterApi } from 'npm:twitter-api-v2';
 
-export { Axios } from "npm:axios";
-
-import rssParser from "npm:rss-parser@3.12.0";
 import moment from "npm:moment-timezone";
 moment.tz.setDefault("Europe/Madrid");
 import humanizeDuration from "npm:humanize-duration";
-export { rssParser, moment, humanizeDuration };
+export { moment, humanizeDuration };
 
 /** Other dependencies */
 /* export { config as dotEnvConfig } from "https://deno.land/x/dotenv@v3.1.0/mod.ts";

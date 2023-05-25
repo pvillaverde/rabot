@@ -38,13 +38,13 @@ export async function refreshPodcast() {
    for (const channel of updateChannels) {
       try {
          // Obtemos a información do RSS
-         const feedData = await getFeedData(channel.rss);
-         if (feedData && feedData.items && feedData.items.length) {
+         const feedData = (await getFeedData(channel.rss)).rss.channel;
+         if (feedData && feedData.item && feedData.item.length) {
             channel.type = "podgalego";
             channel.lastFeedEntry = {
-               title: feedData.items[0].title,
-               published: feedData.items[0].isoDate,
-               link: feedData.items[0].link,
+               title: feedData.item[0].title,
+               published: new Date(feedData.item[0].pubDate).toISOString(),
+               link: feedData.item[0].link,
             }
          }
          // Buscamos se existe xa na BBDD e en caso contrario creámolo.
@@ -53,7 +53,7 @@ export async function refreshPodcast() {
             currentChannel = new PodcastChannel();
             currentChannel.rss = channel.rss;
             currentChannel.channel_name = channel.title;
-            currentChannel.channel_date = feedData?.published || new Date();
+            currentChannel.channel_date = channel.lastFeedEntry?.published as string;
             currentChannel.twitter = channel.twitter as string;
             currentChannel.mastodon = channel.mastodon as string;
             await currentChannel.save();
@@ -63,7 +63,6 @@ export async function refreshPodcast() {
             publish(channel);
          }
          currentChannel.channel_name = channel.title;
-         currentChannel.channel_date = feedData?.published || new Date();
          currentChannel.twitter = channel.twitter as string;
          currentChannel.mastodon = channel.mastodon as string;
          currentChannel.last_podcast_date = channel.lastFeedEntry?.published as string;

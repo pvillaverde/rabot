@@ -1,19 +1,14 @@
 import log from "./logger.service.ts";
-import { rssParser } from "../deps.ts";
-
-const feedParser = new rssParser({
-   customFields: {
-      feed: ['published'],
-   },
-});
+import { parse } from "../deps.ts";
 
 const logger = log.getLogger();
 
 /** Obtén o último elemento dun feed de RSS e quédase cos datos máis relevantes. */
 export async function getFeedData(rssURL: string) {
    try {
-      const feed = await feedParser.parseURL(rssURL);
-      return feed;
+      const response = await fetch(rssURL);
+      const xml = await response.text();
+      return parse(xml);
    } catch (error) {
       logger.warning(`No valid RSS feed for ${rssURL}`)
       logger.warning(error);

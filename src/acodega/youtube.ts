@@ -57,13 +57,13 @@ export async function refreshYoutube() {
    for (const channel of updateChannels) {
       try {
          // Obtemos a información do RSS
-         const feedData = await getFeedData(`https://www.youtube.com/feeds/videos.xml?channel_id=${channel.youtube}`);
-         if (feedData && feedData.items && feedData.items.length) {
+         const feedData = (await getFeedData(`https://www.youtube.com/feeds/videos.xml?channel_id=${channel.youtube}`)).feed;
+         if (feedData && feedData.entry && feedData.entry.length) {
             channel.type = "galegotube";
             channel.lastFeedEntry = {
-               title: feedData.items[0].title,
-               published: feedData.items[0].isoDate,
-               link: feedData.items[0].link,
+               title: feedData.entry[0].title,
+               published: feedData.entry[0].published,
+               link: feedData.entry[0].link["@href"],
             }
          }
          // Buscamos se existe xa na BBDD e en caso contrario creámolo.
@@ -83,7 +83,7 @@ export async function refreshYoutube() {
             const isLessThanHourAgo = moment().diff(channel.lastFeedEntry.published, 'hours') < 1;
             // Triple verificación, comprobar que o vídeo sexa posterior o vídeo anterior.
             const isAfterLastVideo = moment(channel.lastFeedEntry.published).isAfter(moment(currentChannel.last_video_date as string));
-            if (isLessThanHourAgo && isAfterLastVideo) {
+            if (isLessThanHourAgo && (isAfterLastVideo || !currentChannel.last_video_date)) {
                currentChannel.last_video_date = channel.lastFeedEntry?.published as string;
                currentChannel.last_video_title = channel.lastFeedEntry?.title as string;
                currentChannel.last_video_link = channel.lastFeedEntry?.link as string;
