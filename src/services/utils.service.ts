@@ -8,7 +8,11 @@ export async function getFeedData(rssURL: string) {
    try {
       const response = await fetch(rssURL);
       const xml = await response.text();
-      return parse(xml);
+      const json = parse(xml);
+      if (!json.rss && !json.feed) {
+         throw json;
+      }
+      return json;
    } catch (error) {
       logger.warning(`No valid RSS feed for ${rssURL}`)
       logger.warning(error);

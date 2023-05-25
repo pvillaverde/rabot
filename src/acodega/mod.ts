@@ -40,7 +40,7 @@ export async function refreshData() {
          refreshYoutube(),
          refreshTwitch()
       ]),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 1000 * 60 * 10))
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 1000 * 60 * 15))
    ]).catch(error => {
       logger.critical("Algún erro aconteceu ao refescar os logs e pasou o tempo de espera.");
       logger.critical(error);
