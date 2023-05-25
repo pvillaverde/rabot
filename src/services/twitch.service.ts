@@ -62,8 +62,6 @@ async function getAccessToken() {
          },
       });
       const data = await response.json();
-      console.log(data);
-
       Deno.env.set("RABOT_TWITCH_TOKEN", JSON.stringify(data));
       return data;
    } catch (error) {
