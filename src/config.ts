@@ -54,7 +54,7 @@ export const Config = {
       ConsoleLogLevel: Deno.env.get("RABOT_CONSOLE_LOG_LEVEL") as "NOTSET" | "DEBUG" | "INFO" | "WARNING" | "ERROR" | "CRITICAL",
    },
    axenda: {
-      enable: false,
+      enable: true,
       calendarId: "galegotwitch@gmail.com",
       discordChannelId: "777124459400134666",
       discordChannelMessageId: "983067688555397120",
@@ -62,23 +62,23 @@ export const Config = {
       days: 4,
    },
    galegotube: {
-      mastodon: false,
-      twitter: false,
-      discord: false,
+      mastodon: true,
+      twitter: true,
+      discord: true,
       discordChannelName: "🟥youtube-galego",
       messageTemplate: '🤖🎬 {channelName}{mentionUser} acaba de publicar o vídeo "{title}" no #GalegoTube #Youtubeiras. Dálle unha ollada en\n{url}'
    },
    galegotwitch: {
-      mastodon: false,
-      twitter: false,
-      discord: false,
+      mastodon: true,
+      twitter: true,
+      discord: true,
       discordChannelName: "📡emitindo-twitch-galego",
       messageTemplate: '🤖📺 {channelName}{mentionUser} está agora en directo emitindo "{title}" en #GalegoTwitch #TwitchEnGalego. Dálle unha ollada en\n{url}'
    },
    podgalego: {
-      mastodon: false,
+      mastodon: true,
       twitter: false,
-      discord: false,
+      discord: true,
       discordChannelName: "🔊podgalego",
       messageTemplate: '🤖🔊 {channelName}{mentionUser} acaba de publicar un novo falangullo : "{title}" #PodGalego. Podes escoitalo en\n{url}'
    },
