@@ -16,7 +16,7 @@ export { cron, everyMinute, every15Minute, hourly, daily, weekly, monthly } from
 /** node modules */
 
 export { login } from 'npm:masto';
-export { TwitterApi } from 'npm:twitter-api-v2';
+export { TwitterApi } from 'npm:twitter-api-v2@1.14.2';
 
 import moment from "npm:moment-timezone";
 moment.tz.setDefault("Europe/Madrid");
