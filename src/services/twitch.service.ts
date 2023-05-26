@@ -200,8 +200,8 @@ export async function fetchChannelFollowers(channelId: string, cursor?: string, 
       const response = await fetchTwitchEndpoint(`/users/follows?to_id=${channelId}&first=100${pagination}`)
       // If there is a cursor in the response, send another fetch and concat results
       const responseFollowers = response.data || [];
-      if (response.data.pagination.cursor) {
-         return await fetchChannelFollowers(channelId, response.data.pagination.cursor, responseFollowers.concat(previousQueryFollowers));
+      if (response.pagination.cursor) {
+         return await fetchChannelFollowers(channelId, response.pagination.cursor, responseFollowers.concat(previousQueryFollowers));
       } else {
          return responseFollowers.concat(previousQueryFollowers);
       }
@@ -241,8 +241,8 @@ export async function fetchClips(broadcasterId: string, cursor?: string, previou
       const response = await fetchTwitchEndpoint(`/clips?broadcaster_id=${broadcasterId}&first=100${pagination}`)
       // If there is a cursor in the response, send another fetch and concat results
       const responseClips = response.data || [];
-      if (response.data.pagination.cursor) {
-         return await fetchClips(broadcasterId, response.data.pagination.cursor, responseClips.concat(previousQueryClips));
+      if (response.pagination.cursor) {
+         return await fetchClips(broadcasterId, response.pagination.cursor, responseClips.concat(previousQueryClips));
       } else {
          return responseClips.concat(previousQueryClips);
       }
