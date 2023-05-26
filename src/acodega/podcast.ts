@@ -38,7 +38,7 @@ export async function refreshPodcast() {
    for (const channel of updateChannels) {
       try {
          // Obtemos a información do RSS
-         const feedData = (await getFeedData(channel.rss)).rss.channel;
+         const feedData = (await getFeedData(channel.rss))?.rss?.channel;
          if (feedData && feedData.item && feedData.item.length) {
             channel.type = "podgalego";
             channel.lastFeedEntry = {
