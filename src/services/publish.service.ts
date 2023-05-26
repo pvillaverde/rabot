@@ -31,7 +31,8 @@ async function publishMastodon(channel: PodcastChannelData | YoutubeChannelData 
 
       logger.debug(`Published mastodon status in ${status.url}`);
    } catch (error) {
-      logger.error(`Error publishing mastodon status`, error);
+      logger.error(`Error publishing mastodon status`);
+      logger.error(error);
    }
 }
 
@@ -50,7 +51,8 @@ async function publishTwitter(channel: PodcastChannelData | YoutubeChannelData |
       logger.debug(status);
       logger.debug(`Published twitter status for channel ${channel.title}`);
    } catch (error) {
-      logger.error(`Error publishing twitter status`, error);
+      logger.error(`Error publishing twitter status`);
+      logger.error(error);
    }
 }
 
@@ -67,6 +69,7 @@ async function publishDiscord(channel: PodcastChannelData | YoutubeChannelData |
       await sendMessageToDiscordChannels(channel.type, messageStatus)
       logger.debug(`Published discord status for channel ${channel.title}`);
    } catch (error) {
-      logger.error(`Error publishing discord status`, error);
+      logger.error(`Error publishing discord status`);
+      logger.error(error);
    }
 }
