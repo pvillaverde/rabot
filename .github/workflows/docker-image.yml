@@ -8,7 +8,8 @@ on:
 #      - 'main'
 
 jobs:
-  docker:
+  docker-build-push:
+    environment: main
     runs-on: ubuntu-latest
     steps:
       -
@@ -38,7 +39,6 @@ jobs:
         name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
-          context: main
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
