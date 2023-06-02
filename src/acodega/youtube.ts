@@ -57,7 +57,7 @@ export async function refreshYoutube() {
    for (const channel of updateChannels) {
       try {
          // Obtemos a información do RSS
-         const feedData = (await getFeedData(`https://www.youtube.com/feeds/videos.xml?channel_id=${channel.youtube}`))?.feed;
+         const feedData = await getFeedData(`https://www.youtube.com/feeds/videos.xml?channel_id=${channel.youtube}`, `youtube`);
          if (feedData && feedData.entry && feedData.entry.length) {
             channel.type = "galegotube";
             channel.lastFeedEntry = {

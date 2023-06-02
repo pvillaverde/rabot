@@ -4,15 +4,18 @@ import { parse } from "../deps.ts";
 const logger = log.getLogger();
 
 /** Obtén o último elemento dun feed de RSS e quédase cos datos máis relevantes. */
-export async function getFeedData(rssURL: string) {
+export async function getFeedData(rssURL: string, feedType: "rss" | "youtube"): Promise<undefined | any> {
    try {
       const response = await fetch(rssURL);
       const xml = await response.text();
-      const json = parse(xml);
-      if (!json.rss && !json.feed) {
+      const json = parse(xml) as any;
+      if (feedType == "rss" && json.rss && json.rss.channel) {
+         return json.rss.channel;
+      } else if (feedType == "youtube" && json.feed) {
+         return json.feed;
+      } else {
          throw json;
       }
-      return json;
    } catch (error) {
       logger.warning(`No valid RSS feed for ${rssURL}`)
       logger.warning(error);
