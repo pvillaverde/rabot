@@ -1,6 +1,10 @@
 import { log } from "../deps.ts";
 import { Config } from "../config.ts";
 // https://medium.com/deno-the-complete-reference/using-logger-in-deno-44c5b2372bf3
+
+
+try { await Deno.remove("./error.log"); } catch {/* Remove error.log on startup to reset Docker healthyness */}
+
 await log.setup({
    //define handlers
    handlers: {
@@ -14,7 +18,7 @@ await log.setup({
          formatter: rec => JSON.stringify({ datetime: rec.datetime, region: rec.loggerName, level: rec.levelName, data: rec.msg })
       })
    },
-   //assign handlers to loggers  
+   //assign handlers to loggers
    loggers: {
       default: { level: "DEBUG", handlers: ["console", "file"], },
       acodegaService: { level: "DEBUG", handlers: ["console", "file"], },
