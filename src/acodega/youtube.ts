@@ -100,7 +100,7 @@ export async function refreshYoutube() {
          logger.critical(`Erro ao actualizar a canle de Youtube ${channel.title}`);
          logger.critical(error);
       }
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
    }
    logger.info(`Refreshed ${updateChannels.length} youtube channels with their last video`);
    return true;
