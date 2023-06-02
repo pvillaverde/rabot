@@ -1,4 +1,4 @@
-FROM denoland/deno:alpine-1.32.5
+FROM denoland/deno:alpine-1.34.1
 LABEL MAINTAINER="Pablo Villaverde <https://github.com/pvillaverde>"
 
 # build app directory and cache dependencies
