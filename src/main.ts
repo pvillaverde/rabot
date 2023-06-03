@@ -24,6 +24,7 @@ async function bootStrapApp() {
       logger.debug("everyMinute cron")
       // Comprobar se hai canles emitindo en twitch, actualizar mensaxes de discord e enviar das demáis redes.
       await refreshStreams();
+      await Deno.writeTextFile("./healthcheck.txt", new Date().toISOString());
    });
 
    every15Minute(async () => {

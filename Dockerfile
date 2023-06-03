@@ -12,6 +12,7 @@ ADD . /opt/rabot/
 RUN deno cache --import-map=./import_map.json  ./src/main.ts
 
 HEALTHCHECK --interval=10s --timeout=3s --start-period=30s \
-      CMD deno task healthcheck
+      CMD deno task healthcheck || kill 1
+
 
 ENTRYPOINT /opt/rabot/entrypoint.sh

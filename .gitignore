@@ -1,5 +1,6 @@
 deno.lock
 error.log
+healthcheck.txt
 .env
 fileloader.ts
 data
