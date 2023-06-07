@@ -11,7 +11,7 @@ RUN deno cache --import-map=./import_map.json  ./src/deps.ts
 ADD . /opt/rabot/
 RUN deno cache --import-map=./import_map.json  ./src/main.ts
 
-HEALTHCHECK --interval=10s --timeout=3s --start-period=30s \
+HEALTHCHECK --interval=60s --timeout=10s --start-period=900s \
       CMD deno task healthcheck
 
 
