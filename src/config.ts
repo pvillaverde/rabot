@@ -66,20 +66,20 @@ export const Config = {
       twitter: true,
       discord: true,
       discordChannelName: "🟥youtube-galego",
-      messageTemplate: '🤖🎬 {channelName}{mentionUser} acaba de publicar o vídeo "{title}" no #GalegoTube #Youtubeiras. Dálle unha ollada en\n{url}'
+      messageTemplate: '🤖🎬 {channelName}{mentionUser} acaba de publicar o vídeo "{title}". Dálle unha ollada en\n{url} #GalegoTube #Youtubeiras #ACODG'
    },
    galegotwitch: {
       mastodon: true,
       twitter: true,
       discord: true,
       discordChannelName: "📡emitindo-twitch-galego",
-      messageTemplate: '🤖📺 {channelName}{mentionUser} está agora en directo emitindo "{title}" en #GalegoTwitch #TwitchEnGalego. Dálle unha ollada en\n{url}'
+      messageTemplate: '🤖📺 {channelName}{mentionUser} está agora en directo emitindo "{title}". Dálle unha ollada en\n{url} #GalegoTwitch #TwitchEnGalego #ACODG'
    },
    podgalego: {
       mastodon: true,
       twitter: false,
       discord: true,
       discordChannelName: "🔊podgalego",
-      messageTemplate: '🤖🔊 {channelName}{mentionUser} acaba de publicar un novo falangullo : "{title}" #PodGalego. Podes escoitalo en\n{url}'
+      messageTemplate: '🤖🔊 {channelName}{mentionUser} acaba de publicar un novo falangullo : "{title}". Podes escoitalo en\n{url} #PodGalego #ACODG'
    },
 };
