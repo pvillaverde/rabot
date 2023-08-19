@@ -1,5 +1,5 @@
 import log from "./logger.service.ts";
-import { login, TwitterApi } from '../deps.ts';
+import { createRestAPIClient, TwitterApi } from '../deps.ts';
 import { Config, Credentials } from '../config.ts';
 import { sendMessageToDiscordChannels } from '../bot/utils/helpers.ts';
 import { PodcastChannelData } from '../acodega/podcast.ts';
@@ -26,7 +26,7 @@ async function publishMastodon(channel: PodcastChannelData | YoutubeChannelData 
          .replace(/{title}/g, channel.lastFeedEntry && channel.lastFeedEntry.title ? channel.lastFeedEntry.title : ``)
          .replace(/{url}/g, channel.lastFeedEntry && channel.lastFeedEntry.link ? channel.lastFeedEntry.link : ``)
 
-      const mastodon = await login(Credentials[channel.type].mastodon);
+      const mastodon = await createRestAPIClient(Credentials[channel.type].mastodon);
       const status = await mastodon.v1.statuses.create({ status: messageStatus, visibility: 'public', });
 
       logger.debug(`Published mastodon status in ${status.url}`);
