@@ -58,9 +58,9 @@ export class TwitchChannelFollows extends Model {
       from_id: { type: DataTypes.STRING, allowNull: true },
       from_login: { type: DataTypes.STRING, allowNull: true },
       from_name: { type: DataTypes.STRING, allowNull: true },
-      to_id: { type: DataTypes.STRING, allowNull: true },
-      to_login: { type: DataTypes.STRING, allowNull: true },
-      to_name: { type: DataTypes.STRING, allowNull: true },
+      user_id: { type: DataTypes.STRING, allowNull: true },
+      user_login: { type: DataTypes.STRING, allowNull: true },
+      user_name: { type: DataTypes.STRING, allowNull: true },
       followed_at: DataTypes.DATETIME,
    };
    static channel() {

@@ -197,7 +197,7 @@ export async function fetchChannelFollowers(channelId: string, cursor?: string, 
    // Set pagination cursor
    const pagination = cursor ? `&after=${cursor}` : '';
    try {
-      const response = await fetchTwitchEndpoint(`/users/follows?to_id=${channelId}&first=100${pagination}`)
+      const response = await fetchTwitchEndpoint(`/channels/followers?broadcaster_id=${channelId}&first=100${pagination}`)
       // If there is a cursor in the response, send another fetch and concat results
       const responseFollowers = response.data || [];
       if (response.pagination.cursor) {
