@@ -7,6 +7,10 @@ const logger = log.getLogger();
 export async function getFeedData(rssURL: string, feedType: "rss" | "youtube"): Promise<undefined | any> {
    try {
       const response = await fetch(rssURL);
+      // If the URL returns error, throw error and continue.
+      if (response.status !== 200) {
+         throw response.statusText;
+      }
       const xml = await response.text();
       const json = parse(xml) as any;
       if (feedType == "rss" && json.rss && json.rss.channel) {

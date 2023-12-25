@@ -1,50 +1,37 @@
-// import { parse } from "https://deno.land/x/xml/mod.ts";
-
-// const channel = {  }
-// const rssFeedUrl = `https://anchor.fm/s/cdf6f338/podcast/rss`;
-// const response = await fetch(rssFeedUrl);
-// const xml = await response.text();
-// const feedData = parse(xml).rss.channel;
-// if (feedData && feedData.item && feedData.item.length) {
-//    channel.type = "galegotube";
-//    channel.published = feedData.published;
-//    channel.lastFeedEntry = {
-//       title: feedData.item[0].title,
-//       published: new Date(feedData.item[0].pubDate),
-//       link: feedData.item[0].link,
-//    }
-// }
-// console.log(channel);
-
-// const Library = require('twitter-api-v2');
-// const TwitterApi = Library.TwitterApi
-// import { TwitterApi } from 'npm:twitter-api-v2@1.13';
-// const messageStatus = "test";
-// const credentials = {
-// };
-
-// const twitter = new TwitterApi(credentials);
-// twitter.v2.tweet(messageStatus).then(console.log).catch(console.error);
-
-import * as https from 'node:https';
-const options = {
-   hostname: 'httpbin.org',
-   port: 443,
-   path: '/anything',
-   method: 'POST',
-   body: '{"text":"test"}',
- };
-
- const req = https.request(options, (res) => {
-   console.log('statusCode:', res.statusCode);
-   console.log('headers:', res.headers);
-
-   res.on('data', (d) => {
-     console.log(d);
-   });
- });
-
- req.on('error', (e) => {
-   console.error(e);
- });
- req.end();
+import { parse } from "./deps.ts";
+/** Obtén o último elemento dun feed de RSS e quédase cos datos máis relevantes. */
+export async function getFeedData(rssURL: string, feedType: "rss" | "youtube"): Promise<undefined | any> {
+   try {
+      console.log(1)
+      const response = await fetch(rssURL);
+      if (response.status !== 200) {
+         throw response.statusText;
+      }
+      console.log(2, response)
+      const xml = await response.text();
+      console.log(3, xml)
+      const json = parse(xml) as any;
+      console.log(4, json)
+      if (feedType == "rss" && json.rss && json.rss.channel) {
+         return json.rss.channel;
+      } else if (feedType == "youtube" && json.feed) {
+         return json.feed;
+      } else {
+         throw json;
+      }
+      console.log(5)
+   } catch (error) {
+      console.log(`No valid RSS feed for ${rssURL}`)
+      console.log(error);
+      return undefined;
+   }
+}
+async function test() {
+   const channel_uuid = "UCrOJBRzSq9NyOOD37PaGrDg"
+   /* fetch(`https://www.youtube.com/feeds/videos.xml?channel_id=${channel_uuid}`).then(console.log).catch(console.error); */
+   // Obtemos a información do RSS
+   const feedData = await getFeedData(`https://www.youtube.com/feeds/videos.xml?channel_id=${channel_uuid}`, `youtube`);
+   console.log(feedData);
+}
+test();
+Deno.exit(0)
