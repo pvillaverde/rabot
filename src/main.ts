@@ -16,6 +16,7 @@ async function bootStrapApp() {
     ----------------------------------
    `);
    // Refrescado inicial dos datos da web de Obradoiro Dixital Galego
+   await Deno.writeTextFile("./healthcheck.txt", new Date().toISOString());
    await startDiscordBot();
    await refreshData();
    await refreshGames();
@@ -29,16 +30,16 @@ async function bootStrapApp() {
 
    every15Minute(async () => {
       logger.debug("every15Minute cron");
+      // Refrescar os datos de ObradoiroDixitalGalego, novos vídeos de YT, podcasts e usuarios de twitch
+      await refreshData();
+      // Se hai xogos pendentes, refrescar a lista
+      await refreshGames()
    });
 
    hourly(async () => {
       logger.debug("hourly cron")
       // Actualizar axenda do Discord
       await refreshAgenda();
-      // Refrescar os datos de ObradoiroDixitalGalego, novos vídeos de YT, podcasts e usuarios de twitch
-      await refreshData();
-      // Se hai xogos pendentes, refrescar a lista
-      await refreshGames()
 
    });
 
