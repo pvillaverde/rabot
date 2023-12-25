@@ -28,21 +28,21 @@ async function bootStrapApp() {
    });
 
    every15Minute(async () => {
-      logger.debug("every15Minute cron")
-      // Refrescar os datos de ObradoiroDixitalGalego, novos vídeos de YT, podcasts e usuarios de twitch
-      await refreshData();
-      // Se hai xogos pendentes, refrescar a lista
-      await refreshGames();
+      logger.debug("every15Minute cron");
    });
 
    hourly(async () => {
       logger.debug("hourly cron")
       // Actualizar axenda do Discord
       await refreshAgenda();
+      // Refrescar os datos de ObradoiroDixitalGalego, novos vídeos de YT, podcasts e usuarios de twitch
+      await refreshData();
+      // Se hai xogos pendentes, refrescar a lista
+      await refreshGames()
 
    });
 
-   cron("5 2 * * *",async () => {
+   cron("5 2 * * *", async () => {
       logger.debug("Daily cron at 2:00")
 
       // Obter as estatísticas de GalegoTube unha vez o día.
