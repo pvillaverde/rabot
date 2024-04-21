@@ -39,6 +39,13 @@ interface Credentials {
       password: string;
       database: string;
    }
+   mysql?: {
+      host: string;
+      port: number;
+      username: string;
+      password: string;
+      database: string;
+   }
 }
 export const Credentials: Credentials = {
    google: JSON.parse(Deno.env.get("RABOT_GOOGLE_CREDENTIALS") as string),
@@ -48,6 +55,7 @@ export const Credentials: Credentials = {
    galegotwitch: JSON.parse(Deno.env.get("RABOT_GALEGOTWITCH_CREDENTIALS") as string),
    podgalego: JSON.parse(Deno.env.get("RABOT_PODGALEGO_CREDENTIALS") as string),
    postgresql: JSON.parse(Deno.env.get("RABOT_POSTGRESQL_CREDENTIALS") as string),
+   mysql: JSON.parse(Deno.env.get("RABOT_MYSQL_CREDENTIALS") as string),
 }
 export const Config = {
    logger: {

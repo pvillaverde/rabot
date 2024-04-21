@@ -1,11 +1,10 @@
-import { Database, SQLite3Connector, PostgresConnector } from "../deps.ts";
+import { Database, SQLite3Connector, PostgresConnector, MySQLConnector } from "../deps.ts";
 import { refreshYoutube, YoutubeChannel, YoutubeChannelStats } from "./youtube.ts";
 import { refreshPodcast, PodcastChannel } from "./podcast.ts";
 import log from "../services/logger.service.ts";
 import { Credentials } from "../config.ts";
 import { refreshTwitch, TwitchChannel, TwitchChannelFollows, TwitchChannelStats, TwitchClip, TwitchGame, TwitchStream, TwitchStreamViews } from "./twitch.ts";
 export const logger = log.getLogger('acodegaService');
-
 export interface BaseChannelData {
    title: string;
    twitter?: string;
@@ -16,7 +15,14 @@ export interface BaseChannelData {
       link?: string;
    }
 }
-const connector = Credentials.postgresql ? new PostgresConnector(Credentials.postgresql) : new SQLite3Connector({ filepath: './data/acodega.sqlite', });
+let connector;
+if (Credentials.mysql) {
+   connector = new MySQLConnector(Credentials.mysql);
+} else if (Credentials.postgresql) {
+   connector = new PostgresConnector(Credentials.postgresql);
+} else {
+   connector = new SQLite3Connector({ filepath: './data/acodega.sqlite', });
+}
 
 const db = new Database({ connector, debug: false });
 
