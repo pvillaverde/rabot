@@ -43,7 +43,7 @@ export async function refreshPodcast() {
             channel.type = "podgalego";
             channel.lastFeedEntry = {
                title: feedData.item[0].title,
-               published: new Date(feedData.item[0].pubDate).toISOString(),
+               published: new Date(feedData.item[0].pubDate),
                link: feedData.item[0].link,
             }
          }
@@ -53,19 +53,19 @@ export async function refreshPodcast() {
             currentChannel = new PodcastChannel();
             currentChannel.rss = channel.rss;
             currentChannel.channel_name = channel.title;
-            currentChannel.channel_date = channel.lastFeedEntry?.published as string;
+            currentChannel.channel_date = channel.lastFeedEntry?.published as Date;
             currentChannel.twitter = channel.twitter as string;
             currentChannel.mastodon = channel.mastodon as string;
             await currentChannel.save();
          }
          // Se ten último podcast e é distinto do último que recuperou RABOT, publica nas canles que toque.
-         if (channel.lastFeedEntry && currentChannel.last_podcast_date && new Date(currentChannel.last_podcast_date as Date) < new Date(channel.lastFeedEntry.published as string)) {
+         if (channel.lastFeedEntry && currentChannel.last_podcast_date && new Date(currentChannel.last_podcast_date as Date) < new Date(channel.lastFeedEntry.published as Date)) {
             publish(channel);
          }
          currentChannel.channel_name = channel.title;
          currentChannel.twitter = channel.twitter as string;
          currentChannel.mastodon = channel.mastodon as string;
-         currentChannel.last_podcast_date = channel.lastFeedEntry?.published as string;
+         currentChannel.last_podcast_date = channel.lastFeedEntry?.published as Date;
          currentChannel.last_podcast_title = channel.lastFeedEntry?.title as string;
          currentChannel.last_podcast_link = channel.lastFeedEntry?.link as string;
          await currentChannel.update();

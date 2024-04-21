@@ -11,7 +11,7 @@ export interface BaseChannelData {
    mastodon?: string;
    lastFeedEntry: {
       title?: string,
-      published?: string;
+      published?: Date;
       link?: string;
    }
 }

@@ -171,10 +171,10 @@ export async function refreshTwitch() {
                currentChannel.channel_id = channel.id;
                currentChannel.login = channel.login;
                currentChannel.display_name = channel.display_name;
-               currentChannel.channel_created_at = moment(channel.created_at).toISOString(); // FIX para que non se vaian sumando as horas.
+               currentChannel.channel_created_at = moment(channel.created_at).toDate(); // FIX para que non se vaian sumando as horas.
                await currentChannel.save();
             }
-            currentChannel.channel_created_at = moment(channel.created_at).toISOString(); // FIX para que non se vaian sumando as horas.
+            currentChannel.channel_created_at = moment(channel.created_at).toDate(); // FIX para que non se vaian sumando as horas.
             currentChannel.login = channel.login;
             currentChannel.display_name = channel.display_name;
             currentChannel.broadcaster_type = channel.broadcaster_type;
@@ -225,8 +225,8 @@ export async function refreshStreams() {
          currentStream.title = stream.title;
          currentStream.game_id = stream.game_id;
          currentStream.viewer_count = stream.viewer_count;
-         currentStream.started_at = new Date(stream.started_at).toISOString();
-         currentStream.ended_at = new Date().toISOString();
+         currentStream.started_at = new Date(stream.started_at);
+         currentStream.ended_at = new Date();
          currentStream.language = stream.language;
          currentStream.tags = stream.tags ? stream.tags.join(', ') : null;
          currentStream.is_mature = stream.is_mature;
@@ -253,9 +253,9 @@ export async function refreshStreams() {
          currentStream.title = stream.title;
          currentStream.viewer_count = stream.viewer_count;
          currentStream.thumbnail_url = stream.thumbnail_url;
-         currentStream.started_at = new Date(stream.started_at).toISOString(); // FIX para que non se vaian sumando as horas.
+         currentStream.started_at = new Date(stream.started_at); // FIX para que non se vaian sumando as horas.
          currentStream.tags = stream.tags ? stream.tags.join(', ') : null;
-         currentStream.ended_at = new Date().toISOString();
+         currentStream.ended_at = new Date();
          await currentStream.update();
       }
       logger.debug(stream);
@@ -294,8 +294,8 @@ export async function refreshStreams() {
          }
       }
       stream.live_messages = JSON.stringify(liveMessages);
-      stream.started_at = new Date(stream.started_at as Date).toISOString(); // FIX para que non se vaian sumando as horas.
-      stream.ended_at = new Date(stream.ended_at as Date).toISOString(); // FIX para que non se vaian sumando as horas.
+      stream.started_at = new Date(stream.started_at as Date); // FIX para que non se vaian sumando as horas.
+      stream.ended_at = new Date(stream.ended_at as Date); // FIX para que non se vaian sumando as horas.
       await stream.update();
    }
    // Co listado de streams que tiñamos activo, comprobar os que xa non están en directo. Se xan on o están, actualizar o directo coa data de fin e cerrar a notificación de discord.

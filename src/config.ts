@@ -45,6 +45,7 @@ interface Credentials {
       username: string;
       password: string;
       database: string;
+      charset: string; // utf8mb4
    }
 }
 export const Credentials: Credentials = {
