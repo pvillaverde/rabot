@@ -21,11 +21,11 @@ async function bootStrapApp() {
    await refreshData();
    await refreshGames();
 
-   everyMinute(async () => {
+   everyMinute(() => {
       logger.debug("everyMinute cron")
       // Comprobar se hai canles emitindo en twitch, actualizar mensaxes de discord e enviar das demáis redes.
-      await refreshStreams();
-      await Deno.writeTextFile("./healthcheck.txt", new Date().toISOString());
+      new Promise((resolve,reject) => refreshStreams().then(resolve).catch(reject));
+      new Promise((resolve,reject) => Deno.writeTextFile("./healthcheck.txt", new Date().toISOString()).then(resolve).catch(reject));
    });
 
    every15Minute(async () => {
