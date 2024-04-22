@@ -205,100 +205,103 @@ export async function refreshTwitch() {
 
 /** Refrescar os streams: Cada minuto ir ver que canles están en directo e actualizar con iso a información do directo e as visualizacións */
 export async function refreshStreams() {
-   const currentChannels = await TwitchChannel.where('disabled', false).all();
-   // Cos nomes das canles actuais, buscar os streams que están actualmente en emisión.
-   const channelNames = currentChannels.map(c => c.login as string);
-   const currentStreams = await fetchStreams(channelNames);
-   for (const stream of currentStreams) {
-      // TODO: Posible Bug. Cando o stream cae e o volves levantar, a ID do stream é distinta, pero o usuario que emite non.
-      let currentStream = await TwitchStream.find(stream.id)
-      if (!currentStream) {
-         // Crear o novo Stream
-         currentStream = new TwitchStream();
-         currentStream.stream_id = stream.id;
-         currentStream.user_id = stream.user_id;
-         currentStream.type = stream.type;
-         currentStream.user_login = stream.user_login;
-         currentStream.user_name = stream.user_name;
-         currentStream.game_id = stream.game_id;
-         currentStream.game_name = stream.game_name;
-         currentStream.title = stream.title;
-         currentStream.game_id = stream.game_id;
-         currentStream.viewer_count = stream.viewer_count;
-         currentStream.started_at = new Date(stream.started_at);
-         currentStream.ended_at = new Date();
-         currentStream.language = stream.language;
-         currentStream.tags = stream.tags ? stream.tags.join(', ') : null;
-         currentStream.is_mature = stream.is_mature;
-         currentStream.twitchchannelId = stream.user_id;
-         currentStream.thumbnail_url = stream.thumbnail_url;
-         await currentStream.save();
-         const publishChannel: TwitchChannelData = {
-            type: "galegotwitch",
-            twitch: stream.user_login,
-            title: stream.user_name,
-            lastFeedEntry: {
-               title: `${stream.title} (${stream.game_name})`,
-               link: `https://twitch.tv/${stream.user_login}`,
-            }
-         }
-         publish(publishChannel, true, true, false);
-      } else {
-         // Actualizar o stream existente
-         if (stream.game_id && stream.game_id.length > 0) {
+   try {
+      const currentChannels = await TwitchChannel.where('disabled', false).all();
+      // Cos nomes das canles actuais, buscar os streams que están actualmente en emisión.
+      const channelNames = currentChannels.map(c => c.login as string);
+      const currentStreams = await fetchStreams(channelNames);
+      for (const stream of currentStreams) {
+         // TODO: Posible Bug. Cando o stream cae e o volves levantar, a ID do stream é distinta, pero o usuario que emite non.
+         let currentStream = await TwitchStream.find(stream.id)
+         if (!currentStream) {
+            // Crear o novo Stream
+            currentStream = new TwitchStream();
+            currentStream.stream_id = stream.id;
+            currentStream.user_id = stream.user_id;
+            currentStream.type = stream.type;
+            currentStream.user_login = stream.user_login;
+            currentStream.user_name = stream.user_name;
             currentStream.game_id = stream.game_id;
             currentStream.game_name = stream.game_name;
-         }
-         currentStream.type = stream.type;
-         currentStream.title = stream.title;
-         currentStream.viewer_count = stream.viewer_count;
-         currentStream.thumbnail_url = stream.thumbnail_url;
-         currentStream.started_at = new Date(stream.started_at); // FIX para que non se vaian sumando as horas.
-         currentStream.tags = stream.tags ? stream.tags.join(', ') : null;
-         currentStream.ended_at = new Date();
-         await currentStream.update();
-      }
-      logger.debug(stream);
-      // Crear rexistro cos espectadores que ten neste momento.
-      const streamViews = new TwitchStreamViews();
-      streamViews.view_count = currentStream.viewer_count;
-      streamViews.twitchstreamId = currentStream.stream_id;
-      await streamViews.save();
-   }
-   const activeStreams = await TwitchStream.where('type', "live").all();
-   for (const stream of activeStreams) {
-      const channel = await TwitchChannel.find(stream.user_id as string);
-      const game = await TwitchGame.find(stream.game_id as string);
-      let liveMessages: Values = {}
-      try {
-         if (!stream.live_messages) throw undefined;
-         liveMessages = JSON.parse(stream.live_messages as string);
-         // Se o directo leva máis de 5 minutos offline, dámolo por finalizado.
-         if (new Date(stream.ended_at as Date) <= new Date(Date.now() - 1000 * 60 * 5)) {
-            logger.info(`Directo Finalizado de ${stream.user_name}`)
-            stream.type = "offline";
+            currentStream.title = stream.title;
+            currentStream.game_id = stream.game_id;
+            currentStream.viewer_count = stream.viewer_count;
+            currentStream.started_at = new Date(stream.started_at);
+            currentStream.ended_at = new Date();
+            currentStream.language = stream.language;
+            currentStream.tags = stream.tags ? stream.tags.join(', ') : null;
+            currentStream.is_mature = stream.is_mature;
+            currentStream.twitchchannelId = stream.user_id;
+            currentStream.thumbnail_url = stream.thumbnail_url;
+            await currentStream.save();
+            const publishChannel: TwitchChannelData = {
+               type: "galegotwitch",
+               twitch: stream.user_login,
+               title: stream.user_name,
+               lastFeedEntry: {
+                  title: `${stream.title} (${stream.game_name})`,
+                  link: `https://twitch.tv/${stream.user_login}`,
+               }
+            }
+            publish(publishChannel, true, true, false);
          } else {
-            logger.info(`Actualizando o directo da canle ${stream.user_name} =>  ${stream.game_name}: ${stream.title}`)
+            // Actualizar o stream existente
+            if (stream.game_id && stream.game_id.length > 0) {
+               currentStream.game_id = stream.game_id;
+               currentStream.game_name = stream.game_name;
+            }
+            currentStream.type = stream.type;
+            currentStream.title = stream.title;
+            currentStream.viewer_count = stream.viewer_count;
+            currentStream.thumbnail_url = stream.thumbnail_url;
+            currentStream.started_at = new Date(stream.started_at); // FIX para que non se vaian sumando as horas.
+            currentStream.tags = stream.tags ? stream.tags.join(', ') : null;
+            currentStream.ended_at = new Date();
+            await currentStream.update();
          }
-      } catch (_error) {
-         liveMessages = {};
-         logger.info(`A canle ${stream.user_name} comezou a emitir ${stream.game_name}: ${stream.title}`)
+         logger.debug(stream);
+         // Crear rexistro cos espectadores que ten neste momento.
+         const streamViews = new TwitchStreamViews();
+         streamViews.view_count = currentStream.viewer_count;
+         streamViews.twitchstreamId = currentStream.stream_id;
+         await streamViews.save();
       }
-      const message = { embeds: [createLiveEmbedForStream(stream, channel, game)] };
-      for (const discordChannel of targetChannels.galegotwitch) {
-         const channelId = getidString(discordChannel.id);
-         const discordMessage = await updateOrSendMessage(message as any, channelId, liveMessages[channelId]);
-         if (discordMessage) {
-            liveMessages[channelId] = getidString(discordMessage.id);
-            /* await crosspostAnnouncementChannel(discordChannel, discordMessage); */
+      const activeStreams = await TwitchStream.where('type', "live").all();
+      for (const stream of activeStreams) {
+         const channel = await TwitchChannel.find(stream.user_id as string);
+         const game = await TwitchGame.find(stream.game_id as string);
+         let liveMessages: Values = {}
+         try {
+            if (!stream.live_messages) throw undefined;
+            liveMessages = JSON.parse(stream.live_messages as string);
+            // Se o directo leva máis de 5 minutos offline, dámolo por finalizado.
+            if (new Date(stream.ended_at as Date) <= new Date(Date.now() - 1000 * 60 * 5)) {
+               logger.info(`Directo Finalizado de ${stream.user_name}`)
+               stream.type = "offline";
+            } else {
+               logger.info(`Actualizando o directo da canle ${stream.user_name} =>  ${stream.game_name}: ${stream.title}`)
+            }
+         } catch (_error) {
+            liveMessages = {};
+            logger.info(`A canle ${stream.user_name} comezou a emitir ${stream.game_name}: ${stream.title}`)
          }
+         const message = { embeds: [createLiveEmbedForStream(stream, channel, game)] };
+         for (const discordChannel of targetChannels.galegotwitch) {
+            const channelId = getidString(discordChannel.id);
+            const discordMessage = await updateOrSendMessage(message as any, channelId, liveMessages[channelId]);
+            if (discordMessage) {
+               liveMessages[channelId] = getidString(discordMessage.id);
+               /* await crosspostAnnouncementChannel(discordChannel, discordMessage); */
+            }
+         }
+         stream.live_messages = JSON.stringify(liveMessages);
+         stream.started_at = new Date(stream.started_at as Date); // FIX para que non se vaian sumando as horas.
+         stream.ended_at = new Date(stream.ended_at as Date); // FIX para que non se vaian sumando as horas.
+         await stream.update();
       }
-      stream.live_messages = JSON.stringify(liveMessages);
-      stream.started_at = new Date(stream.started_at as Date); // FIX para que non se vaian sumando as horas.
-      stream.ended_at = new Date(stream.ended_at as Date); // FIX para que non se vaian sumando as horas.
-      await stream.update();
-   }
-   // Co listado de streams que tiñamos activo, comprobar os que xa non están en directo. Se xan on o están, actualizar o directo coa data de fin e cerrar a notificación de discord.
+      // Co listado de streams que tiñamos activo, comprobar os que xa non están en directo. Se xan on o están, actualizar o directo coa data de fin e cerrar a notificación de discord.
+   } catch (error) { logger.error(error); }
+   return true;
 }
 /**
  * Refresh followers for the current channels, also storing stats of the current viewCount and followCount

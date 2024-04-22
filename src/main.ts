@@ -11,7 +11,7 @@ async function bootStrapApp() {
    logger.info(`
     ----------------------------------
    |              RABOT               |
-   |  Pablo Villaverde Castro © 2023  |
+   |  Pablo Villaverde Castro © 2024  |
    |     Obradoiro Dixital Galego     |
     ----------------------------------
    `);
