@@ -1,4 +1,4 @@
-import { DataTypes, Model } from "../deps.ts";
+import { DataTypes, Model, moment } from "../deps.ts";
 import { logger, BaseChannelData } from "./mod.ts";
 import { publish } from "../services/publish.service.ts";
 import { fetchJsonData, getFeedData } from "../services/utils.service.ts";
@@ -59,15 +59,21 @@ export async function refreshPodcast() {
             await currentChannel.save();
          }
          // Se ten último podcast e é distinto do último que recuperou RABOT, publica nas canles que toque.
-         if (channel.lastFeedEntry && currentChannel.last_podcast_date && new Date(currentChannel.last_podcast_date as Date) < new Date(channel.lastFeedEntry.published as Date)) {
-            publish(channel);
+         if (channel.lastFeedEntry && channel.lastFeedEntry.link && currentChannel.last_podcast_link != channel.lastFeedEntry.link) {
+            // Doble verificación para evitar un spam de que o podcast é da última hora.
+            const isLessThanHourAgo = moment().diff(channel.lastFeedEntry.published, 'hours') < 1;
+            // Triple verificación, comprobar que o podcast sexa posterior o podcast anterior.
+            const isAfterLastVideo = moment(channel.lastFeedEntry.published).isAfter(moment(currentChannel.last_podcast_date as string));
+            if (isLessThanHourAgo && (isAfterLastVideo || !currentChannel.last_podcast_date)) {
+               currentChannel.last_podcast_date = channel.lastFeedEntry?.published as Date;
+               currentChannel.last_podcast_title = channel.lastFeedEntry?.title as string;
+               currentChannel.last_podcast_link = channel.lastFeedEntry?.link as string;
+               publish(channel);
+            }
          }
          currentChannel.channel_name = channel.title;
          currentChannel.twitter = channel.twitter as string;
          currentChannel.mastodon = channel.mastodon as string;
-         currentChannel.last_podcast_date = channel.lastFeedEntry?.published as Date;
-         currentChannel.last_podcast_title = channel.lastFeedEntry?.title as string;
-         currentChannel.last_podcast_link = channel.lastFeedEntry?.link as string;
          await currentChannel.update();
          logger.debug(currentChannel);
       } catch (error) {
