@@ -43,13 +43,13 @@ async function bootStrapApp() {
 
    });
 
-   cron("5 2 * * *", async () => {
+   cron("5 16 * * *", async () => {
       logger.debug("Daily cron at 2:00")
 
       // Obter as estatísticas de GalegoTube unha vez o día.
       await refreshYoutubeStats();
-      // Refrescar os seguidores de Youtube
-      await refreshFollowers();
+      // Refrescar os seguidores de Twitch - Deshabilitado. Dende Agosto de 2023 xa non se pode sen permisos de moderador en cada canle. https://dev.twitch.tv/docs/api/reference/#get-channel-followers
+      //await refreshFollowers();
       // Refrescar os clips de Twitch
       await refreshClips();
       // Crear unha imaxe diaria cos datos que haxa no calendario.
