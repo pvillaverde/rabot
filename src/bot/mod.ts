@@ -9,6 +9,7 @@ export const targetChannels = {
    galegotube: [] as Channel[],
    galegotwitch: [] as Channel[],
    podgalego: [] as Channel[],
+   blogomillo: [] as Channel[],
 }
 
 import "./events/guildDelete.ts";

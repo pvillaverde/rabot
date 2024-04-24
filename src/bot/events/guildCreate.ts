@@ -7,12 +7,12 @@ events.guildCreate = async (bot: Bot, guild: Guild) => {
    logger.info(`Joined new server: ${guild.name}`)
 
    try {
-      for (const platform of (Object.keys(targetChannels) as ("galegotube" | "galegotwitch" | "podgalego")[])) {
+      for (const platform of (Object.keys(targetChannels) as ("galegotube" | "galegotwitch" | "podgalego" | "blogomillo")[])) {
          if (!Config[platform].discord) continue;
          const channelName = Config[platform].discordChannelName;
          const targetChannel = guild.channels.find((c: Channel) => c.name === channelName);
          if (!targetChannel) {
-            logger.warning(`Configuration problem! Guild ${guild.name} does not have a #${channelName} channel!`)  
+            logger.warning(`Configuration problem! Guild ${guild.name} does not have a #${channelName} channel!`)
             /* await sendMessageToDiscordOwner(bot, guild, `Ocurriu un erro ao configurar o bot, non atopo a canle \`${channelName}\` no servidor \`${guild.name}\`, engádea para recibir as notificacións de ${platform}.`); */
          } else {
             const member = DiscordBot.members.get(DiscordBot.transformers.snowflake(`${bot.id}${guild.id}`))
@@ -28,7 +28,7 @@ events.guildCreate = async (bot: Bot, guild: Guild) => {
    } catch (error) {
       logger.critical(error);
       logger.critical(`Houbo un erro ao enviarlle mensaxe o dono do discord ${guild.name}, así que marcho que teño que marchar.`);
-      leaveGuild(bot, guild.id);     
+      leaveGuild(bot, guild.id);
    }
 }
 

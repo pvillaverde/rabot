@@ -31,11 +31,11 @@ export async function crosspostAnnouncementChannel(channel: Channel, message: Me
 }
 /**
  * sendMessageToDiscordChannels - sends a message to the Discord channels associated with the specified platform
- * @param {string} platform - the platform to send the message to (options: "galegotube", "galegotwitch", "podgalego")
+ * @param {string} platform - the platform to send the message to (options: "galegotube", "galegotwitch", "podgalego", "blogomillo")
  * @param {string} content - the message to send
  * @returns {Promise}
 */
-export async function sendMessageToDiscordChannels(platform: "galegotube" | "galegotwitch" | "podgalego", content: string) {
+export async function sendMessageToDiscordChannels(platform: "galegotube" | "galegotwitch" | "podgalego" | "blogomillo", content: string) {
    for (const channel of targetChannels[platform]) {
       const message = await sendMessage(DiscordBot, channel.id, { content });
       /* crosspostAnnouncementChannel(channel, message); */

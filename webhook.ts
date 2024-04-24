@@ -3,7 +3,7 @@ const webhookUrl = Deno.env.get("WEBHOOK_URL") as string;
 const embeds = [
    {
       title: "<:patria:804013150911332382>  **Asociación Cultural Obradoiro Dixital Galego**",
-      description: `Ola! Dámosche a benvida ó *fogar do contido en galego na rede* <:patria:804013150911332382> .  Esta é unha comunidade que engloba a *Podgalego*, *Twitch en galego*, e *Youtube en galego*. `,
+      description: `Ola! Dámosche a benvida ó *fogar do contido en galego na rede* <:patria:804013150911332382> .  Esta é unha comunidade que engloba a *Podgalego*, *Twitch en galego*, o *Blogomillo* e *Youtube en galego*. `,
       color: 0x26ABFF,
    },
    {

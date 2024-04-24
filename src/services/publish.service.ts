@@ -5,18 +5,19 @@ import { sendMessageToDiscordChannels } from '../bot/utils/helpers.ts';
 import { PodcastChannelData } from '../acodega/podcast.ts';
 import { YoutubeChannelData } from '../acodega/youtube.ts';
 import { TwitchChannelData } from '../acodega/twitch.ts';
+import { BlogSiteData } from "../acodega/blogs.ts";
 
 
 const logger = log.getLogger('publishService');
 
-export function publish(channel: PodcastChannelData | YoutubeChannelData | TwitchChannelData, mastodon = true, twitter = true, discord = true) {
+export function publish(channel: PodcastChannelData | BlogSiteData | YoutubeChannelData | TwitchChannelData, mastodon = true, twitter = true, discord = true) {
    logger.info(`Publishing update for channel ${channel.title}: ${channel.lastFeedEntry.title}`)
    if (mastodon) { publishMastodon(channel); }
    if (twitter) { publishTwitter(channel); }
    if (discord) { publishDiscord(channel); }
 
 }
-async function publishMastodon(channel: PodcastChannelData | YoutubeChannelData | TwitchChannelData) {
+async function publishMastodon(channel: PodcastChannelData | BlogSiteData | YoutubeChannelData | TwitchChannelData) {
    // Se Mastodon non está habilitado para a plataforma non facemos nada.
    if (!Config[channel.type].mastodon) return;
    try {
@@ -36,7 +37,7 @@ async function publishMastodon(channel: PodcastChannelData | YoutubeChannelData 
    }
 }
 
-async function publishTwitter(channel: PodcastChannelData | YoutubeChannelData | TwitchChannelData) {
+async function publishTwitter(channel: PodcastChannelData | BlogSiteData | YoutubeChannelData | TwitchChannelData) {
    // Se Twitter non está habilitado para a plataforma non facemos nada.
    if (!Config[channel.type].twitter) return;
    try {
@@ -56,7 +57,7 @@ async function publishTwitter(channel: PodcastChannelData | YoutubeChannelData |
    }
 }
 
-async function publishDiscord(channel: PodcastChannelData | YoutubeChannelData | TwitchChannelData) {
+async function publishDiscord(channel: PodcastChannelData | BlogSiteData | YoutubeChannelData | TwitchChannelData) {
    // Se Discord non está habilitado para a plataforma non facemos nada.
    if (!Config[channel.type].discord) return;
    try {
